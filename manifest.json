@@ -1,17 +1,17 @@
 {
-  "name": "QrPix",
+  "name": "QrPix - Gerador de Pix",
   "short_name": "QrPix",
-  "start_url": "./index.html",
-  "scope": "./",
+  "description": "Gerador de QR Code Pix e Pix Copia e Cola",
+  "start_url": "./",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#32BCAD",
+  "background_color": "#f2f5f4",
+  "theme_color": "#00a884",
+  "lang": "pt-BR",
   "icons": [
     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Logo_do_Pix.svg/1200px-Logo_do_Pix.svg.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ]
