@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -5,11 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QrPix</title>
     
+    <!-- Configurações PWA -->
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#32BCAD">
     <link rel="icon" type="image/svg+xml" href="./icon.svg">
 
-    <script src="[https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js](https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js)"></script>
+    <!-- Biblioteca QR Code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
@@ -47,9 +50,9 @@
     <label for="valor">Valor (R$) (Opcional):</label>
     <input type="text" id="valor" placeholder="0,00" inputmode="numeric">
 
-    <button onclick="gerarPix()">Gerar QR Code</button>
+    <button type="button" onclick="gerarPix()">Gerar QR Code</button>
 
-    <button id="btn-instalar">Instalar App no Celular</button>
+    <button type="button" id="btn-instalar">Instalar App no Celular</button>
 
     <div id="result" class="result-box">
         <div id="qrcode-container"></div>
@@ -57,12 +60,13 @@
         <label for="pix-payload">Código Pix Copia e Cola:</label>
         <textarea id="pix-payload" readonly></textarea>
         
-        <button onclick="copiarPix()">Copiar Código Pix</button>
-        <button class="btn-whatsapp" onclick="enviarWhatsApp()">Enviar no WhatsApp</button>
+        <button type="button" onclick="copiarPix()">Copiar Código Pix</button>
+        <button type="button" class="btn-whatsapp" onclick="enviarWhatsApp()">Enviar no WhatsApp</button>
     </div>
 </div>
 
 <script>
+// 1. Registro do PWA
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
         navigator.serviceWorker.register('./sw.js').catch(function(err) {
@@ -71,20 +75,22 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// 2. Botão de Instalação
 let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
+window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
     deferredPrompt = e;
     document.getElementById('btn-instalar').style.display = 'block';
 });
 
-document.getElementById('btn-instalar').addEventListener('click', () => {
+document.getElementById('btn-instalar').addEventListener('click', function() {
     if (deferredPrompt) {
         deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+        deferredPrompt.userChoice.then(function() { deferredPrompt = null; });
     }
 });
 
+// 3. Máscara de Moeda
 document.getElementById('valor').addEventListener('input', function(e) {
     let v = e.target.value.replace(/\D/g, '');
     if (!v) { e.target.value = ''; return; }
@@ -94,17 +100,27 @@ document.getElementById('valor').addEventListener('input', function(e) {
     e.target.value = v;
 });
 
+// 4. Limpeza de texto (Sem acentos)
 function limparTexto(txt) {
     if (!txt) return '';
-    return txt.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9 ]/g, "").toUpperCase().trim();
+    return txt.normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .replace(/[^a-zA-Z0-9 ]/g, "")
+              .toUpperCase()
+              .trim();
 }
 
+// 5. Tratamento da Chave Pix
 function formatarChavePix(chave) {
     chave = chave.trim();
     if (chave.includes('@')) return chave.toLowerCase();
     let apenasNumeros = chave.replace(/\D/g, '');
-    if ((apenasNumeros.length === 10 || apenasNumeros.length === 11) && !chave.startsWith('+')) { return '+55' + apenasNumeros; }
-    if (apenasNumeros.length === 11 || apenasNumeros.length === 14) { return apenasNumeros; }
+    if ((apenasNumeros.length === 10 || apenasNumeros.length === 11) && !chave.startsWith('+')) {
+        return '+55' + apenasNumeros;
+    }
+    if (apenasNumeros.length === 11 || apenasNumeros.length === 14) {
+        return apenasNumeros;
+    }
     return chave;
 }
 
@@ -113,63 +129,101 @@ function formatField(id, value) {
     return id + len + value;
 }
 
+// 6. Cálculo CRC16
 function CRC16(str) {
     let crc = 0xFFFF;
     for (let c = 0; c < str.length; c++) {
         crc ^= (str.charCodeAt(c) & 0xFF) << 8;
         for (let i = 0; i < 8; i++) {
-            if ((crc & 0x8000) !== 0) { crc = ((crc << 1) ^ 0x1021) & 0xFFFF; }
-            else { crc = (crc << 1) & 0xFFFF; }
+            if ((crc & 0x8000) !== 0) {
+                crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+            } else {
+                crc = (crc << 1) & 0xFFFF;
+            }
         }
     }
     return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
 }
 
+// 7. Ação de Gerar Pix
 function gerarPix() {
     const chaveRaw = document.getElementById('chave').value;
     const nomeRaw = document.getElementById('nome').value;
     const cidadeRaw = document.getElementById('cidade').value;
     let valorStr = document.getElementById('valor').value.replace(/\./g, '').replace(',', '.').trim();
 
-    if (!chaveRaw || !nomeRaw || !cidadeRaw) { alert('Preencha os dados.'); return; }
+    if (!chaveRaw || !nomeRaw || !cidadeRaw) {
+        alert('Por favor, preencha a chave Pix, o nome e a cidade.');
+        return;
+    }
 
     const chave = formatarChavePix(chaveRaw);
     const nome = limparTexto(nomeRaw).substring(0, 25) || 'RECEBEDOR';
     const cidade = limparTexto(cidadeRaw).substring(0, 15) || 'BRASIL';
 
     let merchantAccount = formatField('00', 'BR.GOV.BCB.PIX') + formatField('01', chave);
-    let payload = formatField('00', '01') + formatField('26', merchantAccount) + formatField('52', '0000') + formatField('53', '986');
-    if (valorStr && !isNaN(valorStr) && parseFloat(valorStr) > 0) { payload += formatField('54', parseFloat(valorStr).toFixed(2)); }
-    payload += formatField('58', 'BR') + formatField('59', nome) + formatField('60', cidade) + formatField('62', formatField('05', '***')) + '6304';
+    let payload = formatField('00', '01') + 
+                  formatField('26', merchantAccount) + 
+                  formatField('52', '0000') + 
+                  formatField('53', '986');
 
-    const pixCompleto = payload + CRC16(payload);
+    if (valorStr && !isNaN(valorStr) && parseFloat(valorStr) > 0) {
+        payload += formatField('54', parseFloat(valorStr).toFixed(2));
+    }
+
+    payload += formatField('58', 'BR') + 
+               formatField('59', nome) + 
+               formatField('60', cidade) + 
+               formatField('62', formatField('05', '***')) + 
+               '6304';
+
+    const crc = CRC16(payload);
+    const pixCompleto = payload + crc;
+
     document.getElementById('pix-payload').value = pixCompleto;
     document.getElementById('qrcode-container').innerHTML = '';
-    new QRCode(document.getElementById('qrcode-container'), { text: pixCompleto, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M });
+
+    new QRCode(document.getElementById('qrcode-container'), {
+        text: pixCompleto,
+        width: 200,
+        height: 200,
+        correctLevel: QRCode.CorrectLevel.M
+    });
+
     document.getElementById('result').style.display = 'block';
 }
 
+// 8. Copiar código
 function copiarPix() {
-    const payload = document.getElementById('pix-payload').value;
-    navigator.clipboard.writeText(payload);
-    alert('Código Pix copiado!');
+    const payloadInput = document.getElementById('pix-payload');
+    if (!payloadInput.value) {
+        alert('Gere o código Pix primeiro!');
+        return;
+    }
+    payloadInput.select();
+    navigator.clipboard.writeText(payloadInput.value);
+    alert('Código Pix copiado com sucesso!');
 }
 
+// 9. Enviar para o WhatsApp
 function enviarWhatsApp() {
     const pixCode = document.getElementById('pix-payload').value;
     const valor = document.getElementById('valor').value.trim();
     const nome = document.getElementById('nome').value.trim();
 
-    // Mensagem Limpa (Sem formatação que atrapalhe o copiar-colar)
+    if (!pixCode) {
+        alert('Gere o QR Code primeiro!');
+        return;
+    }
+
     let texto = valor ? "Pagamento Pix - R$ " + valor + "\n" : "Pagamento Pix\n";
     if (nome) texto += "Recebedor: " + nome + "\n";
-    texto += "\nCopie o código abaixo e cole no seu banco:\n\n" + pixCode;
+    texto += "\nCopie o código abaixo e pague na opção Pix Copia e Cola do seu banco:\n\n" + pixCode;
 
-    const url = "[https://api.whatsapp.com/send?text=](https://api.whatsapp.com/send?text=)" + encodeURIComponent(texto);
+    const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(texto);
     window.open(url, '_blank');
 }
 </script>
 
 </body>
 </html>
-
