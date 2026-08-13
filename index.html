@@ -8,7 +8,7 @@
     <!-- Configurações PWA -->
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#32BCAD">
-    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Logo_do_Pix.svg/1200px-Logo_do_Pix.svg.png">
+    <link rel="icon" type="image/svg+xml" href="./icon.svg">
 
     <!-- Biblioteca QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -24,11 +24,11 @@
         button:hover { background-color: #28998c; }
         .btn-whatsapp { background-color: #25d366; margin-top: 10px; }
         .btn-whatsapp:hover { background-color: #1eb954; }
-        /* Botão de instalação */
         #btn-instalar { background-color: #555; display: none; }
         #qrcode-container { margin-top: 20px; display: flex; justify-content: center; }
         .result-box { display: none; margin-top: 20px; }
         textarea { width: 100%; height: 80px; margin-top: 8px; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-family: monospace; font-size: 12px; resize: none; background: #f9f9f9; }
+        .hint { font-size: 11px; color: #777; margin-top: 3px; }
     </style>
 </head>
 <body>
@@ -37,7 +37,8 @@
     <h1>QrPix</h1>
 
     <label for="chave">Chave Pix:</label>
-    <input type="text" id="chave" placeholder="CPF, CNPJ, E-mail, Celular ou Aleatória">
+    <input type="text" id="chave" placeholder="CPF/CNPJ, E-mail, Celular ou Aleatória">
+    <div class="hint">Celular: digite com DDD (ex: 85999999999)</div>
 
     <label for="nome">Nome do Recebedor:</label>
     <input type="text" id="nome" placeholder="Ex: Cristiano Silva">
@@ -50,7 +51,6 @@
 
     <button onclick="gerarPix()">Gerar QR Code</button>
 
-    <!-- Botão de Instalação (só aparece se o navegador permitir) -->
     <button id="btn-instalar">Instalar App no Celular</button>
 
     <div id="result" class="result-box">
@@ -65,18 +65,16 @@
 </div>
 
 <script>
-// 1. Registro do Service Worker (PWA)
+// 1. Registro PWA
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-        navigator.serviceWorker.register('./sw.js').then(function(reg) {
-            console.log('SW registrado.');
-        }).catch(function(err) {
+        navigator.serviceWorker.register('./sw.js').catch(function(err) {
             console.log('Erro no SW:', err);
         });
     });
 }
 
-// 2. Lógica para forçar a instalação do App
+// 2. Botão de Instalação
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -84,12 +82,10 @@ window.addEventListener('beforeinstallprompt', (e) => {
     document.getElementById('btn-instalar').style.display = 'block';
 });
 
-document.getElementById('btn-instalar').addEventListener('click', (e) => {
+document.getElementById('btn-instalar').addEventListener('click', () => {
     if (deferredPrompt) {
         deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-            deferredPrompt = null;
-        });
+        deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
     }
 });
 
@@ -103,17 +99,31 @@ document.getElementById('valor').addEventListener('input', function(e) {
     e.target.value = v;
 });
 
-// 4. Algoritmo Pix
-function CRC16(str) {
-    let crc = 0xFFFF;
-    for (let c = 0; c < str.length; c++) {
-        crc ^= str.charCodeAt(c) << 8;
-        for (let i = 0; i < 8; i++) {
-            if ((crc & 0x8000) !== 0) crc = (crc << 1) ^ 0x1021;
-            else crc = crc << 1;
-        }
+// 4. Limpeza e Tratamento do Padrão Pix
+function limparTexto(txt) {
+    if (!txt) return '';
+    return txt.normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .replace(/[^a-zA-Z0-9 ]/g, "")
+              .toUpperCase()
+              .trim();
+}
+
+function formatarChavePix(chave) {
+    chave = chave.trim();
+    if (chave.includes('@')) return chave.toLowerCase();
+    
+    let apenasNumeros = chave.replace(/\D/g, '');
+    
+    if ((apenasNumeros.length === 10 || apenasNumeros.length === 11) && !chave.startsWith('+')) {
+        return '+55' + apenasNumeros;
     }
-    return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+    
+    if (apenasNumeros.length === 11 || apenasNumeros.length === 14) {
+        return apenasNumeros;
+    }
+
+    return chave;
 }
 
 function formatField(id, value) {
@@ -121,25 +131,53 @@ function formatField(id, value) {
     return id + len + value;
 }
 
-function gerarPix() {
-    const chave = document.getElementById('chave').value.trim();
-    const nome = document.getElementById('nome').value.trim();
-    const cidade = document.getElementById('cidade').value.trim();
-    let valor = document.getElementById('valor').value.replace(/\./g, '').replace(',', '.').trim();
+// 5. Algoritmo CRC16-CCITT (Oficial do Banco Central)
+function CRC16(str) {
+    let crc = 0xFFFF;
+    for (let c = 0; c < str.length; c++) {
+        crc ^= (str.charCodeAt(c) & 0xFF) << 8;
+        for (let i = 0; i < 8; i++) {
+            if ((crc & 0x8000) !== 0) {
+                crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+            } else {
+                crc = (crc << 1) & 0xFFFF;
+            }
+        }
+    }
+    return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+}
 
-    if (!chave || !nome || !cidade) {
+function gerarPix() {
+    const chaveRaw = document.getElementById('chave').value;
+    const nomeRaw = document.getElementById('nome').value;
+    const cidadeRaw = document.getElementById('cidade').value;
+    let valorStr = document.getElementById('valor').value.replace(/\./g, '').replace(',', '.').trim();
+
+    if (!chaveRaw || !nomeRaw || !cidadeRaw) {
         alert('Por favor, preencha a chave Pix, o nome e a cidade.');
         return;
     }
 
-    let merchantAccount = formatField('00', 'BR.GOV.BCB.PIX') + formatField('01', chave);
-    let payload = formatField('00', '01') + formatField('26', merchantAccount) + formatField('52', '0000') + formatField('53', '986');
+    const chave = formatarChavePix(chaveRaw);
+    const nome = limparTexto(nomeRaw).substring(0, 25) || 'RECEBEDOR';
+    const cidade = limparTexto(cidadeRaw).substring(0, 15) || 'BRASIL';
 
-    if (valor && !isNaN(valor) && parseFloat(valor) > 0) {
-        payload += formatField('54', parseFloat(valor).toFixed(2));
+    let merchantAccount = formatField('00', 'BR.GOV.BCB.PIX') + formatField('01', chave);
+    
+    let payload = formatField('00', '01') + 
+                  formatField('26', merchantAccount) + 
+                  formatField('52', '0000') + 
+                  formatField('53', '986');
+
+    if (valorStr && !isNaN(valorStr) && parseFloat(valorStr) > 0) {
+        payload += formatField('54', parseFloat(valorStr).toFixed(2));
     }
 
-    payload += formatField('58', 'BR') + formatField('59', nome.substring(0, 25)) + formatField('60', cidade.substring(0, 15)) + formatField('62', formatField('05', '***')) + '6304';
+    payload += formatField('58', 'BR') + 
+               formatField('59', nome) + 
+               formatField('60', cidade) + 
+               formatField('62', formatField('05', '***')) + 
+               '6304';
 
     const crc = CRC16(payload);
     const pixCompleto = payload + crc;
@@ -147,7 +185,13 @@ function gerarPix() {
     document.getElementById('pix-payload').value = pixCompleto;
     document.getElementById('qrcode-container').innerHTML = '';
 
-    new QRCode(document.getElementById('qrcode-container'), { text: pixCompleto, width: 180, height: 180 });
+    new QRCode(document.getElementById('qrcode-container'), {
+        text: pixCompleto,
+        width: 200,
+        height: 200,
+        correctLevel: QRCode.CorrectLevel.M
+    });
+
     document.getElementById('result').style.display = 'block';
 }
 
@@ -158,10 +202,23 @@ function copiarPix() {
     alert('Código Pix copiado!');
 }
 
+// 6. Mensagem Simplificada para WhatsApp
 function enviarWhatsApp() {
     const pixCode = document.getElementById('pix-payload').value;
     const valor = document.getElementById('valor').value.trim();
-    let texto = valor ? `Segue a cobrança Pix de R$ ${valor}:\n\n` + pixCode : `Segue a chave Pix:\n\n` + pixCode;
+    const nome = document.getElementById('nome').value.trim();
+
+    if (!pixCode) {
+        alert('Gere o QR Code primeiro!');
+        return;
+    }
+
+    let texto = valor ? `*Pix - R$ ${valor}*\n` : `*Pagamento Pix*\n`;
+    if (nome) texto += `Recebedor: ${nome}\n`;
+    
+    texto += `\nCopie o código abaixo e pague na opção *Pix Copia e Cola* do seu banco:\n\n`;
+    texto += `\`\`\`${pixCode}\`\`\``;
+
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
     window.open(url, '_blank');
 }
@@ -169,7 +226,3 @@ function enviarWhatsApp() {
 
 </body>
 </html>
-
-        
-
-
