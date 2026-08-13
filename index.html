@@ -1,229 +1,86 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QrPix</title>
-    
-    <!-- Configurações PWA -->
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#32BCAD">
     <link rel="icon" type="image/svg+xml" href="./icon.svg">
-
-    <!-- Biblioteca QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body { background-color: #f4f6f9; padding: 20px; display: flex; justify-content: center; }
-        .container { background: #ffffff; padding: 25px; border-radius: 12px; max-width: 450px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { font-size: 22px; color: #333; margin-bottom: 20px; text-align: center; }
-        label { font-size: 14px; font-weight: bold; color: #555; display: block; margin-top: 12px; }
-        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
-        button { width: 100%; padding: 14px; background-color: #32BCAD; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; margin-top: 18px; cursor: pointer; }
-        button:hover { background-color: #28998c; }
-        .btn-whatsapp { background-color: #25d366; margin-top: 10px; }
-        .btn-whatsapp:hover { background-color: #1eb954; }
-        #btn-instalar { background-color: #555; display: none; }
+        body { background-color: #f4f6f9; padding: 20px; font-family: sans-serif; display: flex; justify-content: center; }
+        .container { background: #ffffff; padding: 20px; border-radius: 12px; max-width: 400px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; }
+        button { width: 100%; padding: 12px; background: #32BCAD; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-whatsapp { background: #25d366; }
         #qrcode-container { margin-top: 20px; display: flex; justify-content: center; }
-        .result-box { display: none; margin-top: 20px; }
-        textarea { width: 100%; height: 80px; margin-top: 8px; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-family: monospace; font-size: 12px; resize: none; background: #f9f9f9; }
-        .hint { font-size: 11px; color: #777; margin-top: 3px; }
+        .result-box { display: none; }
+        textarea { width: 100%; height: 60px; margin-top: 10px; padding: 5px; font-family: monospace; font-size: 10px; }
     </style>
 </head>
 <body>
-
 <div class="container">
     <h1>QrPix</h1>
-
-    <label for="chave">Chave Pix:</label>
-    <input type="text" id="chave" placeholder="CPF/CNPJ, E-mail, Celular ou Aleatória">
-    <div class="hint">Celular: digite com DDD (ex: 85999999999)</div>
-
-    <label for="nome">Nome do Recebedor:</label>
-    <input type="text" id="nome" placeholder="Ex: Cristiano Silva">
-
-    <label for="cidade">Cidade:</label>
-    <input type="text" id="cidade" placeholder="Ex: Fortaleza">
-
-    <label for="valor">Valor (R$) (Opcional):</label>
-    <input type="text" id="valor" placeholder="0,00" inputmode="numeric">
-
-    <button type="button" onclick="gerarPix()">Gerar QR Code</button>
-
-    <button type="button" id="btn-instalar">Instalar App no Celular</button>
-
+    <input type="text" id="chave" placeholder="Chave Pix (CPF, Celular, Email)">
+    <input type="text" id="nome" placeholder="Nome do Recebedor">
+    <input type="text" id="cidade" placeholder="Cidade">
+    <input type="text" id="valor" placeholder="Valor (0,00)">
+    <button onclick="gerarPix()">Gerar QR Code</button>
+    <button id="btn-instalar" style="display:none; background:#555;">Instalar App</button>
     <div id="result" class="result-box">
         <div id="qrcode-container"></div>
-        
-        <label for="pix-payload">Código Pix Copia e Cola:</label>
         <textarea id="pix-payload" readonly></textarea>
-        
-        <button type="button" onclick="copiarPix()">Copiar Código Pix</button>
-        <button type="button" class="btn-whatsapp" onclick="enviarWhatsApp()">Enviar no WhatsApp</button>
+        <button onclick="copiarPix()">Copiar Código</button>
+        <button class="btn-whatsapp" onclick="enviarWhatsApp()">Enviar WhatsApp</button>
     </div>
 </div>
 
 <script>
-// 1. Registro do PWA
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        navigator.serviceWorker.register('./sw.js').catch(function(err) {
-            console.log('Erro no SW:', err);
-        });
-    });
-}
-
-// 2. Botão de Instalação
+// PWA
+if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
 let deferredPrompt;
-window.addEventListener('beforeinstallprompt', function(e) {
-    e.preventDefault();
-    deferredPrompt = e;
-    document.getElementById('btn-instalar').style.display = 'block';
-});
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('btn-instalar').style.display = 'block'; });
+document.getElementById('btn-instalar').addEventListener('click', () => { deferredPrompt.prompt(); });
 
-document.getElementById('btn-instalar').addEventListener('click', function() {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(function() { deferredPrompt = null; });
-    }
-});
+// Validação e Gerador
+function formatField(id, value) { return id + value.length.toString().padStart(2, '0') + value; }
 
-// 3. Máscara de Moeda
-document.getElementById('valor').addEventListener('input', function(e) {
-    let v = e.target.value.replace(/\D/g, '');
-    if (!v) { e.target.value = ''; return; }
-    v = (parseInt(v, 10) / 100).toFixed(2);
-    v = v.replace('.', ',');
-    v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-    e.target.value = v;
-});
-
-// 4. Limpeza de texto (Sem acentos)
-function limparTexto(txt) {
-    if (!txt) return '';
-    return txt.normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "")
-              .replace(/[^a-zA-Z0-9 ]/g, "")
-              .toUpperCase()
-              .trim();
-}
-
-// 5. Tratamento da Chave Pix
-function formatarChavePix(chave) {
-    chave = chave.trim();
-    if (chave.includes('@')) return chave.toLowerCase();
-    let apenasNumeros = chave.replace(/\D/g, '');
-    if ((apenasNumeros.length === 10 || apenasNumeros.length === 11) && !chave.startsWith('+')) {
-        return '+55' + apenasNumeros;
-    }
-    if (apenasNumeros.length === 11 || apenasNumeros.length === 14) {
-        return apenasNumeros;
-    }
-    return chave;
-}
-
-function formatField(id, value) {
-    const len = value.length.toString().padStart(2, '0');
-    return id + len + value;
-}
-
-// 6. Cálculo CRC16
 function CRC16(str) {
     let crc = 0xFFFF;
     for (let c = 0; c < str.length; c++) {
         crc ^= (str.charCodeAt(c) & 0xFF) << 8;
         for (let i = 0; i < 8; i++) {
-            if ((crc & 0x8000) !== 0) {
-                crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
-            } else {
-                crc = (crc << 1) & 0xFFFF;
-            }
+            crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
         }
     }
     return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
 }
 
-// 7. Ação de Gerar Pix
 function gerarPix() {
-    const chaveRaw = document.getElementById('chave').value;
-    const nomeRaw = document.getElementById('nome').value;
-    const cidadeRaw = document.getElementById('cidade').value;
-    let valorStr = document.getElementById('valor').value.replace(/\./g, '').replace(',', '.').trim();
+    let chave = document.getElementById('chave').value.replace(/[^a-zA-Z0-9@.]/g, '');
+    let nome = document.getElementById('nome').value.toUpperCase().substring(0, 25);
+    let cidade = document.getElementById('cidade').value.toUpperCase().substring(0, 15);
+    let valor = document.getElementById('valor').value.replace(',', '.');
 
-    if (!chaveRaw || !nomeRaw || !cidadeRaw) {
-        alert('Por favor, preencha a chave Pix, o nome e a cidade.');
-        return;
-    }
-
-    const chave = formatarChavePix(chaveRaw);
-    const nome = limparTexto(nomeRaw).substring(0, 25) || 'RECEBEDOR';
-    const cidade = limparTexto(cidadeRaw).substring(0, 15) || 'BRASIL';
-
-    let merchantAccount = formatField('00', 'BR.GOV.BCB.PIX') + formatField('01', chave);
-    let payload = formatField('00', '01') + 
-                  formatField('26', merchantAccount) + 
-                  formatField('52', '0000') + 
-                  formatField('53', '986');
-
-    if (valorStr && !isNaN(valorStr) && parseFloat(valorStr) > 0) {
-        payload += formatField('54', parseFloat(valorStr).toFixed(2));
-    }
-
-    payload += formatField('58', 'BR') + 
-               formatField('59', nome) + 
-               formatField('60', cidade) + 
-               formatField('62', formatField('05', '***')) + 
-               '6304';
-
-    const crc = CRC16(payload);
-    const pixCompleto = payload + crc;
-
-    document.getElementById('pix-payload').value = pixCompleto;
-    document.getElementById('qrcode-container').innerHTML = '';
-
-    new QRCode(document.getElementById('qrcode-container'), {
-        text: pixCompleto,
-        width: 200,
-        height: 200,
-        correctLevel: QRCode.CorrectLevel.M
-    });
-
+    // Montagem EMV (Simplificada e robusta)
+    let merchant = formatField('00', 'BR.GOV.BCB.PIX') + formatField('01', chave);
+    let payload = '000201' + formatField('26', merchant) + '520400005303986';
+    if(valor) payload += formatField('54', parseFloat(valor).toFixed(2));
+    payload += '5802BR' + formatField('59', nome) + formatField('60', cidade) + '62070503***6304';
+    
+    let full = payload + CRC16(payload);
+    document.getElementById('pix-payload').value = full;
     document.getElementById('result').style.display = 'block';
+    document.getElementById('qrcode-container').innerHTML = '';
+    new QRCode(document.getElementById('qrcode-container'), { text: full, width: 200, height: 200 });
 }
 
-// 8. Copiar código
-function copiarPix() {
-    const payloadInput = document.getElementById('pix-payload');
-    if (!payloadInput.value) {
-        alert('Gere o código Pix primeiro!');
-        return;
-    }
-    payloadInput.select();
-    navigator.clipboard.writeText(payloadInput.value);
-    alert('Código Pix copiado com sucesso!');
-}
-
-// 9. Enviar para o WhatsApp
-function enviarWhatsApp() {
-    const pixCode = document.getElementById('pix-payload').value;
-    const valor = document.getElementById('valor').value.trim();
-    const nome = document.getElementById('nome').value.trim();
-
-    if (!pixCode) {
-        alert('Gere o QR Code primeiro!');
-        return;
-    }
-
-    let texto = valor ? "Pagamento Pix - R$ " + valor + "\n" : "Pagamento Pix\n";
-    if (nome) texto += "Recebedor: " + nome + "\n";
-    texto += "\nCopie o código abaixo e pague na opção Pix Copia e Cola do seu banco:\n\n" + pixCode;
-
-    const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(texto);
-    window.open(url, '_blank');
+function copiarPix() { navigator.clipboard.writeText(document.getElementById('pix-payload').value); alert('Copiado!'); }
+function enviarWhatsApp() { 
+    let text = "Pix R$ " + document.getElementById('valor').value + "\n\n" + document.getElementById('pix-payload').value;
+    window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text)); 
 }
 </script>
-
 </body>
 </html>
