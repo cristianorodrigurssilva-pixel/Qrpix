@@ -1,166 +1,703 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QrPix</title>
-    
-    <!-- Configurações PWA -->
-    <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#32BCAD">
-    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Logo_do_Pix.svg/1200px-Logo_do_Pix.svg.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Biblioteca QR Code -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body { background-color: #f4f6f9; padding: 20px; display: flex; justify-content: center; }
-        .container { background: #ffffff; padding: 25px; border-radius: 12px; max-width: 450px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { font-size: 22px; color: #333; margin-bottom: 20px; text-align: center; }
-        label { font-size: 14px; font-weight: bold; color: #555; display: block; margin-top: 12px; }
-        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
-        button { width: 100%; padding: 14px; background-color: #32BCAD; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; margin-top: 18px; cursor: pointer; }
-        button:hover { background-color: #28998c; }
-        .btn-whatsapp { background-color: #25d366; margin-top: 10px; }
-        .btn-whatsapp:hover { background-color: #1eb954; }
-        #qrcode-container { margin-top: 20px; display: flex; justify-content: center; }
-        .result-box { display: none; margin-top: 20px; }
-        textarea { width: 100%; height: 80px; margin-top: 8px; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-family: monospace; font-size: 12px; resize: none; background: #f9f9f9; }
-    </style>
+<meta name="theme-color" content="#00a884">
+
+<link rel="manifest" href="manifest.json">
+
+<title>QrPix</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f2f5f4;
+    color: #17211f;
+}
+
+header {
+    background: #00a884;
+    color: white;
+    padding: 18px;
+    text-align: center;
+}
+
+.logo {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.container {
+    max-width: 680px;
+    margin: 20px auto;
+    padding: 0 15px;
+}
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 3px 14px #00000015;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-top: 14px;
+    margin-bottom: 6px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ccd6d2;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.primary {
+    width: 100%;
+    margin-top: 18px;
+    background: #00a884;
+    color: white;
+}
+
+.secondary {
+    background: #e7f5f1;
+    color: #007d64;
+}
+
+.whatsapp {
+    background: #25d366;
+    color: white;
+}
+
+.actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+#qrcode {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+#qrcode img {
+    max-width: 100%;
+}
+
+.codebox {
+    background: #f4f7f6;
+    border: 1px dashed #aebcb8;
+    border-radius: 10px;
+    padding: 12px;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 13px;
+}
+
+.hidden {
+    display: none;
+}
+
+.status {
+    text-align: center;
+    margin-top: 12px;
+}
+
+.saved {
+    background: #f0faf7;
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 10px;
+    font-size: 13px;
+}
+
+.note {
+    color: #687773;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+footer {
+    text-align: center;
+    color: #71807c;
+    font-size: 12px;
+    padding: 20px;
+}
+
+@media(max-width:500px) {
+
+    .actions {
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+}
+
+</style>
 </head>
+
 <body>
 
-<div class="container">
-    <h1>QrPix</h1>
+<header>
 
-    <label for="chave">Chave Pix:</label>
-    <input type="text" id="chave" placeholder="CPF, CNPJ, E-mail, Celular ou Aleatória">
+<div class="logo">▣ QrPix</div>
 
-    <label for="nome">Nome do Recebedor:</label>
-    <input type="text" id="nome" placeholder="Ex: Cristiano Silva">
+<div>Gerador de Pix</div>
 
-    <label for="cidade">Cidade:</label>
-    <input type="text" id="cidade" placeholder="Ex: Fortaleza">
+</header>
 
-    <label for="valor">Valor (R$) (Opcional):</label>
-    <input type="text" id="valor" placeholder="0,00" inputmode="numeric">
 
-    <button onclick="gerarPix()">Gerar QR Code</button>
+<main class="container">
 
-    <div id="result" class="result-box">
-        <div id="qrcode-container"></div>
-        
-        <label for="pix-payload">Código Pix Copia e Cola:</label>
-        <textarea id="pix-payload" readonly></textarea>
-        
-        <button onclick="copiarPix()">Copiar Código Pix</button>
-        <button class="btn-whatsapp" onclick="enviarWhatsApp()">Enviar no WhatsApp</button>
-    </div>
+<section class="card">
+
+<h2>Dados do Pix</h2>
+
+
+<label>Chave Pix</label>
+
+<input
+id="chave"
+placeholder="CPF, CNPJ, celular, e-mail ou chave aleatória"
+>
+
+
+<label>Nome do recebedor</label>
+
+<input
+id="nome"
+maxlength="25"
+placeholder="Nome"
+>
+
+
+<label>Cidade</label>
+
+<input
+id="cidade"
+maxlength="15"
+placeholder="Cidade"
+>
+
+
+<label>Valor</label>
+
+<input
+id="valor"
+inputmode="decimal"
+placeholder="R$ 0,00"
+>
+
+
+<button
+class="primary"
+onclick="gerarPix()"
+>
+
+Gerar QR Code Pix
+
+</button>
+
+
+<div
+id="salvo"
+class="saved hidden"
+>
+✓ Dados salvos neste aparelho.
 </div>
 
+
+<p class="note">
+
+A chave Pix, nome e cidade ficam salvos neste aparelho.
+
+</p>
+
+</section>
+
+
+<section
+id="resultado"
+class="card hidden"
+>
+
+<h2>Pix gerado</h2>
+
+
+<div id="qrcode"></div>
+
+
+<div
+id="payload"
+class="codebox"
+></div>
+
+
+<div class="actions">
+
+<button
+class="secondary"
+onclick="copiarPix()"
+>
+
+Copiar código
+
+</button>
+
+
+<button
+class="whatsapp"
+onclick="compartilharWhatsApp()"
+>
+
+WhatsApp
+
+</button>
+
+</div>
+
+
+<div
+id="status"
+class="status"
+></div>
+
+</section>
+
+</main>
+
+
+<footer>
+
+QrPix • Gerador de Pix
+
+</footer>
+
+
 <script>
-// 1. Registro do Service Worker (PWA)
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        navigator.serviceWorker.register('./sw.js').then(function(reg) {
-            console.log('SW registrado:', reg.scope);
-        }).catch(function(err) {
-            console.log('Erro no SW:', err);
-        });
-    });
+
+const chave =
+document.getElementById("chave");
+
+const nome =
+document.getElementById("nome");
+
+const cidade =
+document.getElementById("cidade");
+
+const valor =
+document.getElementById("valor");
+
+
+/* =========================
+   SALVAR DADOS
+========================= */
+
+function salvarDados() {
+
+localStorage.setItem(
+"qrpix_chave",
+chave.value
+);
+
+localStorage.setItem(
+"qrpix_nome",
+nome.value
+);
+
+localStorage.setItem(
+"qrpix_cidade",
+cidade.value
+);
+
+document
+.getElementById("salvo")
+.classList.remove("hidden");
+
 }
 
-// 2. Máscara de Moeda
-document.getElementById('valor').addEventListener('input', function(e) {
-    let v = e.target.value.replace(/\D/g, '');
-    if (!v) {
-        e.target.value = '';
-        return;
-    }
-    v = (parseInt(v, 10) / 100).toFixed(2);
-    v = v.replace('.', ',');
-    v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-    e.target.value = v;
+
+/* =========================
+   CARREGAR DADOS
+========================= */
+
+window.onload = function() {
+
+chave.value =
+localStorage.getItem("qrpix_chave") || "";
+
+nome.value =
+localStorage.getItem("qrpix_nome") || "";
+
+cidade.value =
+localStorage.getItem("qrpix_cidade") || "";
+
+};
+
+
+/* =========================
+   MÁSCARA DE MOEDA
+========================= */
+
+valor.addEventListener(
+"input",
+function() {
+
+let numeros =
+this.value.replace(/\D/g,"");
+
+if (!numeros) {
+
+this.value = "";
+
+return;
+
+}
+
+let numero =
+parseInt(numeros) / 100;
+
+this.value =
+numero.toLocaleString(
+"pt-BR",
+{
+style:"currency",
+currency:"BRL"
+}
+);
+
 });
 
-// 3. Algoritmo Pix
-function CRC16(str) {
-    let crc = 0xFFFF;
-    for (let c = 0; c < str.length; c++) {
-        crc ^= str.charCodeAt(c) << 8;
-        for (let i = 0; i < 8; i++) {
-            if ((crc & 0x8000) !== 0) {
-                crc = (crc << 1) ^ 0x1021;
-            } else {
-                crc = crc << 1;
-            }
-        }
-    }
-    return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+
+/* =========================
+   CRC16
+========================= */
+
+function crc16(str) {
+
+let crc = 0xFFFF;
+
+for (
+let i = 0;
+i < str.length;
+i++
+) {
+
+crc ^=
+str.charCodeAt(i) << 8;
+
+for (
+let j = 0;
+j < 8;
+j++
+) {
+
+if (
+crc & 0x8000
+) {
+
+crc =
+(crc << 1) ^
+0x1021;
+
+} else {
+
+crc =
+crc << 1;
+
 }
 
-function formatField(id, value) {
-    const len = value.length.toString().padStart(2, '0');
-    return id + len + value;
+crc &=
+0xFFFF;
+
 }
+
+}
+
+return crc
+.toString(16)
+.toUpperCase()
+.padStart(4,"0");
+
+}
+
+
+/* =========================
+   CAMPO PIX
+========================= */
+
+function campo(id, valor) {
+
+return (
+id +
+String(valor.length)
+.padStart(2,"0") +
+valor
+);
+
+}
+
+
+/* =========================
+   GERAR PIX
+========================= */
 
 function gerarPix() {
-    const chave = document.getElementById('chave').value.trim();
-    const nome = document.getElementById('nome').value.trim();
-    const cidade = document.getElementById('cidade').value.trim();
-    let valor = document.getElementById('valor').value.replace(/\./g, '').replace(',', '.').trim();
 
-    if (!chave || !nome || !cidade) {
-        alert('Por favor, preencha a chave Pix, o nome e a cidade.');
-        return;
-    }
+if (
+!chave.value ||
+!nome.value ||
+!cidade.value
+) {
 
-    let merchantAccount = formatField('00', 'BR.GOV.BCB.PIX') + formatField('01', chave);
-    let payload = formatField('00', '01') + formatField('26', merchantAccount) + formatField('52', '0000') + formatField('53', '986');
+document.getElementById(
+"status"
+).innerText =
+"Preencha a chave, nome e cidade.";
 
-    if (valor && !isNaN(valor) && parseFloat(valor) > 0) {
-        payload += formatField('54', parseFloat(valor).toFixed(2));
-    }
+return;
 
-    payload += formatField('58', 'BR') + formatField('59', nome.substring(0, 25)) + formatField('60', cidade.substring(0, 15)) + formatField('62', formatField('05', '***')) + '6304';
-
-    const crc = CRC16(payload);
-    const pixCompleto = payload + crc;
-
-    document.getElementById('pix-payload').value = pixCompleto;
-    document.getElementById('qrcode-container').innerHTML = '';
-
-    new QRCode(document.getElementById('qrcode-container'), {
-        text: pixCompleto,
-        width: 180,
-        height: 180
-    });
-
-    document.getElementById('result').style.display = 'block';
 }
+
+
+salvarDados();
+
+
+let chavePix =
+chave.value.trim();
+
+
+let nomePix =
+nome.value
+.trim()
+.normalize("NFD")
+.replace(/[\u0300-\u036f]/g,"")
+.toUpperCase()
+.substring(0,25);
+
+
+let cidadePix =
+cidade.value
+.trim()
+.normalize("NFD")
+.replace(/[\u0300-\u036f]/g,"")
+.toUpperCase()
+.substring(0,15);
+
+
+/* CONTA DO RECEBEDOR */
+
+let gui =
+campo(
+"00",
+"br.gov.bcb.pix"
+);
+
+let chaveCampo =
+campo(
+"01",
+chavePix
+);
+
+let merchant =
+campo(
+"26",
+gui + chaveCampo
+);
+
+
+/* PAYLOAD */
+
+let pix =
+campo("00","01") +
+merchant +
+campo("52","0000") +
+campo("53","986");
+
+
+/* VALOR */
+
+let valorTexto =
+valor.value
+.replace("R$","")
+.replace(/\./g,"")
+.replace(",",".")
+.trim();
+
+
+let valorNumero =
+parseFloat(valorTexto);
+
+
+if (
+!isNaN(valorNumero) &&
+valorNumero > 0
+) {
+
+pix +=
+campo(
+"54",
+valorNumero.toFixed(2)
+);
+
+}
+
+
+pix +=
+campo("58","BR");
+
+pix +=
+campo("59",nomePix);
+
+pix +=
+campo("60",cidadePix);
+
+
+/* IDENTIFICADOR */
+
+pix +=
+campo(
+"62",
+campo("05","***")
+);
+
+
+/* CRC */
+
+pix += "6304";
+
+pix += crc16(pix);
+
+
+/* MOSTRAR */
+
+document.getElementById(
+"payload"
+).innerText = pix;
+
+
+document.getElementById(
+"qrcode"
+).innerHTML = "";
+
+
+new QRCode(
+document.getElementById("qrcode"),
+{
+text: pix,
+width: 280,
+height: 280
+}
+);
+
+
+document
+.getElementById("resultado")
+.classList.remove("hidden");
+
+
+document.getElementById(
+"status"
+).innerText =
+"QR Code gerado com sucesso!";
+
+
+document
+.getElementById("resultado")
+.scrollIntoView({
+behavior:"smooth"
+});
+
+}
+
+
+/* =========================
+   COPIAR
+========================= */
 
 function copiarPix() {
-    const payloadInput = document.getElementById('pix-payload');
-    payloadInput.select();
-    payloadInput.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(payloadInput.value);
-    alert('Código Pix copiado!');
+
+let codigo =
+document.getElementById(
+"payload"
+).innerText;
+
+
+navigator.clipboard
+.writeText(codigo)
+.then(function() {
+
+document.getElementById(
+"status"
+).innerText =
+"✓ Código Pix copiado!";
+
+});
+
 }
 
-function enviarWhatsApp() {
-    const pixCode = document.getElementById('pix-payload').value;
-    const valor = document.getElementById('valor').value.trim();
-    let texto = `Olá! Segue a chave Pix para pagamento:\n\n\`\`\`${pixCode}\`\`\``;
-    
-    if (valor) {
-        texto = `Olá! Segue a cobrança Pix no valor de R$ ${valor}:\n\n\`\`\`${pixCode}\`\`\``;
-    }
 
-    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
-    window.open(url, '_blank');
+/* =========================
+   WHATSAPP
+========================= */
+
+function compartilharWhatsApp() {
+
+let codigo =
+document.getElementById(
+"payload"
+).innerText;
+
+
+let mensagem =
+"Olá! Segue o Pix para pagamento.%0A%0A" +
+"Copia e Cola:%0A" +
+encodeURIComponent(codigo);
+
+
+window.open(
+"https://wa.me/?text=" +
+mensagem,
+"_blank"
+);
+
 }
+
 </script>
 
+
 </body>
+
 </html>
