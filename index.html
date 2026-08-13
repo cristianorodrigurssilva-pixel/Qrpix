@@ -6,9 +6,9 @@
     <title>QrPix</title>
     
     <!-- Configurações PWA -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#32BCAD">
-    <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Logo_do_Pix.svg/1200px-Logo_do_Pix.svg.png">
+    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Logo_do_Pix.svg/1200px-Logo_do_Pix.svg.png">
 
     <!-- Biblioteca QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -60,13 +60,13 @@
 </div>
 
 <script>
-// 1. Registro PWA
+// 1. Registro do Service Worker (PWA)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
         navigator.serviceWorker.register('./sw.js').then(function(reg) {
-            console.log('SW ativo:', reg.scope);
+            console.log('SW registrado:', reg.scope);
         }).catch(function(err) {
-            console.log('Erro SW:', err);
+            console.log('Erro no SW:', err);
         });
     });
 }
