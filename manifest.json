@@ -1,18 +1,10 @@
 {
-  "name": "QrPix - Gerador de Pix",
+  "name": "QrPix",
   "short_name": "QrPix",
-  "description": "Gerador de QR Code Pix e Pix Copia e Cola",
-  "start_url": "./",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#f2f5f4",
-  "theme_color": "#00a884",
-  "lang": "pt-BR",
-  "icons": [
-    {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
-  ]
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#32BCAD"
 }
