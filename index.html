@@ -48,10 +48,10 @@
     <label for="valor">Valor (R$) (Opcional):</label>
     <input type="text" id="valor" placeholder="0,00" inputmode="numeric">
 
-    <button onclick="gerarPix()">Gerar QR Code</button>
+    <button type="button" onclick="gerarPix()">Gerar QR Code</button>
 
-    <!-- Botão de Instalação (só aparece se o navegador permitir) -->
-    <button id="btn-instalar">Instalar App no Celular</button>
+    <!-- Botão de Instalação -->
+    <button type="button" id="btn-instalar">Instalar App no Celular</button>
 
     <div id="result" class="result-box">
         <div id="qrcode-container"></div>
@@ -59,13 +59,32 @@
         <label for="pix-payload">Código Pix Copia e Cola:</label>
         <textarea id="pix-payload" readonly></textarea>
         
-        <button onclick="copiarPix()">Copiar Código Pix</button>
-        <button class="btn-whatsapp" onclick="enviarWhatsApp()">Enviar no WhatsApp</button>
+        <button type="button" onclick="copiarPix()">Copiar Código Pix</button>
+        <button type="button" class="btn-whatsapp" onclick="enviarWhatsApp()">Enviar no WhatsApp</button>
     </div>
 </div>
 
 <script>
-// 1. Registro do Service Worker (PWA)
+// 1. Persistência de Dados (localStorage)
+document.addEventListener('DOMContentLoaded', function() {
+    // Carrega os dados salvos anteriormente
+    if (localStorage.getItem('pix_chave')) document.getElementById('chave').value = localStorage.getItem('pix_chave');
+    if (localStorage.getItem('pix_nome')) document.getElementById('nome').value = localStorage.getItem('pix_nome');
+    if (localStorage.getItem('pix_cidade')) document.getElementById('cidade').value = localStorage.getItem('pix_cidade');
+
+    // Salva automaticamente conforme você digita
+    document.getElementById('chave').addEventListener('input', function(e) {
+        localStorage.setItem('pix_chave', e.target.value);
+    });
+    document.getElementById('nome').addEventListener('input', function(e) {
+        localStorage.setItem('pix_nome', e.target.value);
+    });
+    document.getElementById('cidade').addEventListener('input', function(e) {
+        localStorage.setItem('pix_cidade', e.target.value);
+    });
+});
+
+// 2. Registro do Service Worker (PWA)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
         navigator.serviceWorker.register('./sw.js').then(function(reg) {
@@ -76,7 +95,7 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// 2. Lógica para forçar a instalação do App
+// 3. Lógica para instalação do App
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -93,7 +112,7 @@ document.getElementById('btn-instalar').addEventListener('click', (e) => {
     }
 });
 
-// 3. Máscara de Moeda
+// 4. Máscara de Moeda
 document.getElementById('valor').addEventListener('input', function(e) {
     let v = e.target.value.replace(/\D/g, '');
     if (!v) { e.target.value = ''; return; }
@@ -103,7 +122,7 @@ document.getElementById('valor').addEventListener('input', function(e) {
     e.target.value = v;
 });
 
-// 4. Algoritmo Pix
+// 5. Algoritmo Pix
 function CRC16(str) {
     let crc = 0xFFFF;
     for (let c = 0; c < str.length; c++) {
@@ -169,5 +188,3 @@ function enviarWhatsApp() {
 
 </body>
 </html>
-
-    
