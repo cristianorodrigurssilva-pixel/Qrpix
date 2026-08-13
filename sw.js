@@ -1,15 +1,68 @@
-const CACHE_NAME = 'qrpix-v1';
+const CACHE_NAME = "qrpix-v1";
 
-self.addEventListener('install', (e) => {
-  self.skipWaiting();
-});
+const FILES = [
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./icon.svg"
+];
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(clients.claim());
-});
+self.addEventListener("install", function(event) {
 
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+  event.waitUntil(
+
+    caches.open(CACHE_NAME).then(function(cache) {
+
+      return cache.addAll(FILES);
+
+    })
+
   );
+
+  self.skipWaiting();
+
+});
+
+
+self.addEventListener("activate", function(event) {
+
+  event.waitUntil(
+
+    caches.keys().then(function(names) {
+
+      return Promise.all(
+
+        names.map(function(name) {
+
+          if (name !== CACHE_NAME) {
+
+            return caches.delete(name);
+
+          }
+
+        })
+
+      );
+
+    })
+
+  );
+
+  self.clients.claim();
+
+});
+
+
+self.addEventListener("fetch", function(event) {
+
+  event.respondWith(
+
+    caches.match(event.request).then(function(response) {
+
+      return response || fetch(event.request);
+
+    })
+
+  );
+
 });
