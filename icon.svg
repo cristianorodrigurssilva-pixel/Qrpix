@@ -1,57 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <!-- Fundo Escuro Profundo (Cobre/Espaço) -->
-    <radialGradient id="bgCipher" cx="50%" cy="45%" r="65%">
-      <stop offset="0%" stop-color="#151D2A" />
-      <stop offset="100%" stop-color="#070A0F" />
-    </radialGradient>
-
-    <!-- Gradiente Neon Neon/Cyber -->
-    <linearGradient id="neonCore" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00F5D4" />
-      <stop offset="50%" stop-color="#32BCAD" />
-      <stop offset="100%" stop-color="#7B2CBF" />
+    <!-- Fundo Roxo/Azul Escuro Profundo -->
+    <linearGradient id="bgOrigami" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#181824" />
+      <stop offset="100%" stop-color="#0B0B12" />
     </linearGradient>
 
-    <!-- Efeito de Brilho Intenso (Glow) -->
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="12" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    <!-- Sombras 3D das Dobras -->
+    <filter id="shadowOrigami" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="4" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.5" />
     </filter>
   </defs>
 
-  <!-- Fundo do App (Squircle) -->
-  <rect width="512" height="512" rx="110" fill="url(#bgCipher)" />
+  <!-- Fundo do Ícone -->
+  <rect width="512" height="512" rx="110" fill="url(#bgOrigami)" />
 
-  <!-- Anel Externo de Obturador/Cofre Tecnológico -->
-  <circle cx="256" cy="205" r="130" fill="none" stroke="#222F43" stroke-width="6" />
-  <circle cx="256" cy="205" r="130" fill="none" stroke="url(#neonCore)" stroke-width="6" stroke-dasharray="40 20 80 15" transform="rotate(25 256 205)" opacity="0.8" />
+  <!-- Moldura Estilizada de QR Code (Bordas dobradas) -->
+  <path d="M 120 170 V 130 H 170" stroke="#FF6B6B" stroke-width="10" stroke-linecap="round" fill="none" />
+  <path d="M 342 130 H 392 V 170" stroke="#32BCAD" stroke-width="10" stroke-linecap="round" fill="none" />
+  <path d="M 120 290 V 330 H 170" stroke="#32BCAD" stroke-width="10" stroke-linecap="round" fill="none" />
 
-  <!-- Feixes de Mira / Leitor Cifrado -->
-  <path d="M 256 55 V 85 M 256 325 V 355 M 106 205 H 136 M 376 205 H 406" stroke="url(#neonCore)" stroke-width="4" stroke-linecap="round" opacity="0.6" />
+  <!-- Símbolo Pix em estilo Dobradura 3D -->
+  <g transform="translate(256, 215)" filter="url(#shadowOrigami)">
+    <!-- Losango Topo (Laranja Coral) -->
+    <polygon points="0,-70 32,-38 0,-6 -32,-38" fill="#FF6B6B" />
+    <!-- Sombra da dobra do topo -->
+    <polygon points="0,-70 32,-38 0,-6" fill="#000000" opacity="0.15" />
 
-  <!-- O Portal / Fechadura Central (Mistura de Pix + QR Code + Keyhole) -->
-  <g filter="url(#glow)">
-    <!-- Formato de Fechadura/Portal Holográfico -->
-    <path d="M 230 145 C 230 130 240 120 256 120 C 272 120 282 130 282 145 C 282 160 270 170 264 180 L 274 245 C 276 252 270 260 260 260 H 252 C 242 260 236 252 238 245 L 248 180 C 242 170 230 160 230 145 Z" fill="url(#neonCore)" />
-    
-    <!-- Módulos Pix Flutuando (Efeito de Criptografia se Montando) -->
-    <rect x="175" y="190" width="28" height="28" rx="6" fill="#00F5D4" transform="rotate(45 189 204)" />
-    <rect x="309" y="190" width="28" height="28" rx="6" fill="#00F5D4" transform="rotate(45 323 204)" />
-    <rect x="242" y="125" width="28" height="28" rx="6" fill="#FFFFFF" transform="rotate(45 256 139)" />
+    <!-- Losango Direita (Verde Pix Principal) -->
+    <polygon points="64,-6 96,26 64,58 32,26" fill="#32BCAD" />
+    <polygon points="64,-6 96,26 64,58" fill="#000000" opacity="0.15" />
+
+    <!-- Losango Baixo (Amarelo Ouro) -->
+    <polygon points="0,26 32,58 0,90 -32,58" fill="#FFD166" />
+    <polygon points="0,26 32,58 0,90" fill="#000000" opacity="0.15" />
+
+    <!-- Losango Esquerda (Turquesa Escuro) -->
+    <polygon points="-64,-6 -32,26 -64,58 -96,26" fill="#1B9AAA" />
+    <polygon points="-64,-6 -32,26 -64,58" fill="#000000" opacity="0.15" />
+
+    <!-- Núcleo Conector Central (Branco) -->
+    <polygon points="0,-18 18,0 0,18 -18,0" fill="#FFFFFF" />
   </g>
 
-  <!-- Partículas de Dados Flutuantes -->
-  <circle cx="160" cy="130" r="4" fill="#00F5D4" opacity="0.7" />
-  <circle cx="350" cy="270" r="5" fill="#7B2CBF" opacity="0.8" />
-  <circle cx="340" cy="120" r="3" fill="#FFFFFF" opacity="0.9" />
-  <circle cx="170" cy="280" r="4" fill="#32BCAD" opacity="0.6" />
-
-  <!-- Texto Enigmático "QrPix" -->
-  <text x="50%" y="435" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="50" fill="#FFFFFF" text-anchor="middle" letter-spacing="6">
-    QR<tspan fill="url(#neonCore)">PIX</tspan>
+  <!-- Nome QrPix com estilo Tipográfico Artístico -->
+  <text x="50%" y="435" font-family="'Trebuchet MS', 'Segoe UI', sans-serif" font-weight="900" font-size="52" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">
+    Qr<tspan fill="#32BCAD">Pix</tspan>
   </text>
 
-  <!-- Ponto Cibernético no Nome -->
-  <circle cx="380" cy="425" r="5" fill="#00F5D4" filter="url(#glow)" />
+  <!-- Detalhe de Ponto Flutuante (Pixel de QR) -->
+  <circle cx="365" cy="325" r="8" fill="#FFD166" filter="url(#shadowOrigami)" />
 </svg>
