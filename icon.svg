@@ -1,33 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <!-- Gradiente Verde Pix -->
-    <linearGradient id="pixGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#32BCAD" />
-      <stop offset="100%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#1E9688" />
     </linearGradient>
   </defs>
 
-  <!-- Fundo Escuro Moderno -->
-  <rect width="512" height="512" rx="110" fill="#0F172A"/>
+  <!-- Fundo Turquesa -->
+  <rect width="512" height="512" rx="110" fill="url(#bgGrad)"/>
 
-  <!-- Moldura de QR Code estilizada -->
-  <rect x="116" y="90" width="80" height="80" rx="18" fill="none" stroke="url(#pixGrad)" stroke-width="12"/>
-  <rect x="136" y="110" width="40" height="40" rx="8" fill="url(#pixGrad)"/>
+  <!-- Cartão Branco Central -->
+  <rect x="96" y="80" width="320" height="320" rx="40" fill="#FFFFFF" />
 
-  <rect x="316" y="90" width="80" height="80" rx="18" fill="none" stroke="url(#pixGrad)" stroke-width="12"/>
-  <rect x="336" y="110" width="40" height="40" rx="8" fill="url(#pixGrad)"/>
+  <!-- Símbolo QR Code Minimalista -->
+  <path d="M 156 140 h 60 v 60 h -60 z M 296 140 h 60 v 60 h -60 z M 156 280 h 60 v 60 h -60 z" fill="#1A202C"/>
+  <path d="M 176 160 h 20 v 20 h -20 z M 316 160 h 20 v 20 h -20 z M 176 300 h 20 v 20 h -20 z" fill="#32BCAD"/>
+  
+  <!-- Detalhes do QR -->
+  <rect x="296" y="280" width="25" height="25" rx="4" fill="#32BCAD"/>
+  <rect x="331" y="315" width="25" height="25" rx="4" fill="#1A202C"/>
+  <rect x="256" y="140" width="20" height="60" rx="4" fill="#32BCAD"/>
+  <rect x="256" y="240" width="60" height="20" rx="4" fill="#1A202C"/>
 
-  <rect x="116" y="290" width="80" height="80" rx="18" fill="none" stroke="url(#pixGrad)" stroke-width="12"/>
-  <rect x="136" y="310" width="40" height="40" rx="8" fill="url(#pixGrad)"/>
-
-  <!-- Símbolo Pix no centro -->
-  <g transform="translate(256, 230) scale(0.7)" fill="url(#pixGrad)">
-    <path d="M0 -50 L35 -15 L0 20 L-35 -15 Z" />
-    <path d="M-50 0 L-15 35 L20 0 L-15 -35 Z" />
-    <path d="M0 50 L35 15 L0 -20 L-35 15 Z" />
-    <path d="M50 0 L15 35 L-20 0 L15 -35 Z" />
-  </g>
-
-  <!-- Texto QrPix -->
-  <text x="50%" y="430" font-family="'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="52" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">QrPix</text>
+  <!-- Texto QrPix na base -->
+  <text x="50%" y="450" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="56" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">QrPix</text>
 </svg>
