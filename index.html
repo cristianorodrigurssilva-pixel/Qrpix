@@ -8,7 +8,7 @@
     <!-- Configurações PWA -->
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#32BCAD">
-    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Logo_do_Pix.svg/1200px-Logo_do_Pix.svg.png">
+    <link rel="icon" type="image/svg+xml" href="./icon.svg">
 
     <!-- Biblioteca QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -177,33 +177,19 @@ function copiarPix() {
     alert('Código Pix copiado!');
 }
 
-function enviarWhatsApp(tipo) {
+function enviarWhatsApp() {
     const pixCode = document.getElementById('pix-payload').value;
     const valor = document.getElementById('valor').value.trim();
-
-    if (!pixCode) {
-        mostrarToast('Gere o Pix primeiro!');
-        return;
-    }
-
-    let texto = '';
-
-    if (tipo === 'codigo_puro') {
-        // Envia SOMENTE a chave/código Pix puro (sem texto nenhum antes)
-        texto = pixCode;
-    } else {
-        // Envia apenas o valor (se houver) e o código Pix formatado em bloco
-        texto = valor 
-            ? `*R$ ${valor}*\n\`\`\`${pixCode}\`\`\`` 
-            : `\`\`\`${pixCode}\`\`\``;
-    }
-
+    
+    // Envia apenas R$ VALOR se houver, ou somente o código Pix bruto
+    let texto = valor ? `*R$ ${valor}*\n\n` + pixCode : pixCode;
+    
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
     window.open(url, '_blank');
-}
-
 }
 </script>
 
 </body>
 </html>
+
+            
