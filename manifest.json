@@ -1,16 +1,15 @@
 {
   "name": "QrPix",
   "short_name": "QrPix",
+  "description": "Gerador de QR Code e Código Copia e Cola do Pix rápido e prático.",
   "start_url": "./index.html",
-  "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#32BCAD",
   "icons": [
     {
-      "src": "icon.svg",
-      "sizes": "512x512 192x192",
+      "src": "./icon.svg",
+      "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
