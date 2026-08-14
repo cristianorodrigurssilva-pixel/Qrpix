@@ -67,12 +67,10 @@
 <script>
 // 1. Persistência de Dados (localStorage)
 document.addEventListener('DOMContentLoaded', function() {
-    // Carrega os dados salvos anteriormente
     if (localStorage.getItem('pix_chave')) document.getElementById('chave').value = localStorage.getItem('pix_chave');
     if (localStorage.getItem('pix_nome')) document.getElementById('nome').value = localStorage.getItem('pix_nome');
     if (localStorage.getItem('pix_cidade')) document.getElementById('cidade').value = localStorage.getItem('pix_cidade');
 
-    // Salva automaticamente conforme você digita
     document.getElementById('chave').addEventListener('input', function(e) {
         localStorage.setItem('pix_chave', e.target.value);
     });
@@ -179,17 +177,12 @@ function copiarPix() {
 
 function enviarWhatsApp() {
     const pixCode = document.getElementById('pix-payload').value;
-    const valor = document.getElementById('valor').value.trim();
-    
-    // Envia apenas R$ VALOR se houver, ou somente o código Pix bruto
-    let texto = valor ? `*R$ ${valor}*\n\n` + pixCode : pixCode;
-    
-    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
+    // Envia EXCLUSIVAMENTE o código do Pix
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(pixCode)}`;
     window.open(url, '_blank');
 }
 </script>
 
 </body>
 </html>
-
-            
+    
