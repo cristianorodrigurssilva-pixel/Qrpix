@@ -1,27 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#32BCAD" />
-      <stop offset="100%" stop-color="#1E9688" />
+    <!-- Fundo Roxo/Azul Escuro Profundo -->
+    <linearGradient id="bgOrigami" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#181824" />
+      <stop offset="100%" stop-color="#0B0B12" />
     </linearGradient>
+
+    <!-- Sombras 3D das Dobras -->
+    <filter id="shadowOrigami" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="4" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.5" />
+    </filter>
   </defs>
 
-  <!-- Fundo Turquesa -->
-  <rect width="512" height="512" rx="110" fill="url(#bgGrad)"/>
+  <!-- Fundo do Ícone -->
+  <rect width="512" height="512" rx="110" fill="url(#bgOrigami)" />
 
-  <!-- Cartão Branco Central -->
-  <rect x="96" y="80" width="320" height="320" rx="40" fill="#FFFFFF" />
+  <!-- Moldura Estilizada de QR Code (Bordas dobradas) -->
+  <path d="M 120 170 V 130 H 170" stroke="#FF6B6B" stroke-width="10" stroke-linecap="round" fill="none" />
+  <path d="M 342 130 H 392 V 170" stroke="#32BCAD" stroke-width="10" stroke-linecap="round" fill="none" />
+  <path d="M 120 290 V 330 H 170" stroke="#32BCAD" stroke-width="10" stroke-linecap="round" fill="none" />
 
-  <!-- Símbolo QR Code Minimalista -->
-  <path d="M 156 140 h 60 v 60 h -60 z M 296 140 h 60 v 60 h -60 z M 156 280 h 60 v 60 h -60 z" fill="#1A202C"/>
-  <path d="M 176 160 h 20 v 20 h -20 z M 316 160 h 20 v 20 h -20 z M 176 300 h 20 v 20 h -20 z" fill="#32BCAD"/>
-  
-  <!-- Detalhes do QR -->
-  <rect x="296" y="280" width="25" height="25" rx="4" fill="#32BCAD"/>
-  <rect x="331" y="315" width="25" height="25" rx="4" fill="#1A202C"/>
-  <rect x="256" y="140" width="20" height="60" rx="4" fill="#32BCAD"/>
-  <rect x="256" y="240" width="60" height="20" rx="4" fill="#1A202C"/>
+  <!-- Símbolo Pix em estilo Dobradura 3D -->
+  <g transform="translate(256, 215)" filter="url(#shadowOrigami)">
+    <!-- Losango Topo (Laranja Coral) -->
+    <polygon points="0,-70 32,-38 0,-6 -32,-38" fill="#FF6B6B" />
+    <!-- Sombra da dobra do topo -->
+    <polygon points="0,-70 32,-38 0,-6" fill="#000000" opacity="0.15" />
 
-  <!-- Texto QrPix na base -->
-  <text x="50%" y="450" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="56" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">QrPix</text>
+    <!-- Losango Direita (Verde Pix Principal) -->
+    <polygon points="64,-6 96,26 64,58 32,26" fill="#32BCAD" />
+    <polygon points="64,-6 96,26 64,58" fill="#000000" opacity="0.15" />
+
+    <!-- Losango Baixo (Amarelo Ouro) -->
+    <polygon points="0,26 32,58 0,90 -32,58" fill="#FFD166" />
+    <polygon points="0,26 32,58 0,90" fill="#000000" opacity="0.15" />
+
+    <!-- Losango Esquerda (Turquesa Escuro) -->
+    <polygon points="-64,-6 -32,26 -64,58 -96,26" fill="#1B9AAA" />
+    <polygon points="-64,-6 -32,26 -64,58" fill="#000000" opacity="0.15" />
+
+    <!-- Núcleo Conector Central (Branco) -->
+    <polygon points="0,-18 18,0 0,18 -18,0" fill="#FFFFFF" />
+  </g>
+
+  <!-- Nome QrPix com estilo Tipográfico Artístico -->
+  <text x="50%" y="435" font-family="'Trebuchet MS', 'Segoe UI', sans-serif" font-weight="900" font-size="52" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">
+    Qr<tspan fill="#32BCAD">Pix</tspan>
+  </text>
+
+  <!-- Detalhe de Ponto Flutuante (Pixel de QR) -->
+  <circle cx="365" cy="325" r="8" fill="#FFD166" filter="url(#shadowOrigami)" />
 </svg>
