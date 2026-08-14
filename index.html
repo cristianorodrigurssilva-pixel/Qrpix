@@ -177,12 +177,31 @@ function copiarPix() {
     alert('Código Pix copiado!');
 }
 
-function enviarWhatsApp() {
+function enviarWhatsApp(tipo) {
     const pixCode = document.getElementById('pix-payload').value;
     const valor = document.getElementById('valor').value.trim();
-    let texto = valor ? `Segue a cobrança Pix de R$ ${valor}:\n\n` + pixCode : `Segue a chave Pix:\n\n` + pixCode;
+
+    if (!pixCode) {
+        mostrarToast('Gere o Pix primeiro!');
+        return;
+    }
+
+    let texto = '';
+
+    if (tipo === 'codigo_puro') {
+        // Envia SOMENTE a chave/código Pix puro (sem texto nenhum antes)
+        texto = pixCode;
+    } else {
+        // Envia apenas o valor (se houver) e o código Pix formatado em bloco
+        texto = valor 
+            ? `*R$ ${valor}*\n\`\`\`${pixCode}\`\`\`` 
+            : `\`\`\`${pixCode}\`\`\``;
+    }
+
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
     window.open(url, '_blank');
+}
+
 }
 </script>
 
