@@ -28,7 +28,7 @@
         #btn-instalar { background-color: #555; display: none; }
         #qrcode-container { margin-top: 20px; display: flex; justify-content: center; }
         .result-box { display: none; margin-top: 20px; }
-        textarea { width: 100%; height: 80px; margin-top: 8px; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-family: monospace; font-size: 12px; resize: none; background: #f9f9f9; }
+        textarea { width: 100%; height: 80px; margin-top: 8px; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-family: monospace; font-size: 12px; resize: none; background: #f9f9f9; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -81,6 +81,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     document.getElementById('cidade').addEventListener('input', function(e) {
         localStorage.setItem('pix_cidade', e.target.value);
+    });
+
+    // 1.1 Cópia automática ao tocar no campo de texto do Código Pix
+    const pixPayloadInput = document.getElementById('pix-payload');
+    pixPayloadInput.addEventListener('click', function() {
+        executarCopia(this);
     });
 });
 
@@ -170,16 +176,38 @@ function gerarPix() {
     document.getElementById('result').style.display = 'block';
 }
 
+// Função unificada para cópia automática e exibição da mensagem de alerta
+function executarCopia(elemento) {
+    if (!elemento.value) return;
+    
+    elemento.focus();
+    elemento.select();
+    elemento.setSelectionRange(0, 99999); // Suporte para dispositivos móveis
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(elemento.value).then(function() {
+            alert('Código Pix copiado! Abra o app do seu banco e acesse a opção "Pix Copia e Cola" para realizar o pagamento.');
+        }).catch(function() {
+            document.execCommand('copy');
+            alert('Código Pix copiado! Abra o app do seu banco e acesse a opção "Pix Copia e Cola" para realizar o pagamento.');
+        });
+    } else {
+        document.execCommand('copy');
+        alert('Código Pix copiado! Abra o app do seu banco e acesse a opção "Pix Copia e Cola" para realizar o pagamento.');
+    }
+}
+
 function copiarPix() {
     const payloadInput = document.getElementById('pix-payload');
-    payloadInput.select();
-    navigator.clipboard.writeText(payloadInput.value);
-    alert('Código Pix copiado!');
+    executarCopia(payloadInput);
 }
 
 function enviarWhatsApp() {
     const pixCode = document.getElementById('pix-payload').value;
-    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(pixCode)}`;
+    if (!pixCode) return;
+
+    const mensagem = `${pixCode}\n\n(Código Pix Copia e Cola. Toque sobre o código para copiar e cole no app do seu banco na opção Pix Copia e Cola)`;
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`;
     window.open(url, '_blank');
 }
 </script>
