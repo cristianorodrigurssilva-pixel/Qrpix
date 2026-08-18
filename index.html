@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('pix_cidade', e.target.value);
     });
 
-    // 1.1 Cópia automática ao tocar no campo de texto do Código Pix
+    // Cópia automática ao tocar no campo de texto do Código Pix
     const pixPayloadInput = document.getElementById('pix-payload');
     pixPayloadInput.addEventListener('click', function() {
         executarCopia(this);
@@ -176,24 +176,24 @@ function gerarPix() {
     document.getElementById('result').style.display = 'block';
 }
 
-// Função unificada para cópia automática e exibição da mensagem de alerta
+// Função de Cópia Automática com mensagem de confirmação
 function executarCopia(elemento) {
     if (!elemento.value) return;
     
     elemento.focus();
     elemento.select();
-    elemento.setSelectionRange(0, 99999); // Suporte para dispositivos móveis
+    elemento.setSelectionRange(0, 99999);
 
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(elemento.value).then(function() {
-            alert('Código Pix copiado! Abra o app do seu banco e acesse a opção "Pix Copia e Cola" para realizar o pagamento.');
+            alert('Código Pix copiado! Abra o app do seu banco e escolha a opção "Pix Copia e Cola".');
         }).catch(function() {
             document.execCommand('copy');
-            alert('Código Pix copiado! Abra o app do seu banco e acesse a opção "Pix Copia e Cola" para realizar o pagamento.');
+            alert('Código Pix copiado! Abra o app do seu banco e escolha a opção "Pix Copia e Cola".');
         });
     } else {
         document.execCommand('copy');
-        alert('Código Pix copiado! Abra o app do seu banco e acesse a opção "Pix Copia e Cola" para realizar o pagamento.');
+        alert('Código Pix copiado! Abra o app do seu banco e escolha a opção "Pix Copia e Cola".');
     }
 }
 
@@ -202,13 +202,24 @@ function copiarPix() {
     executarCopia(payloadInput);
 }
 
+// Envio para o WhatsApp com a mensagem explicativa ANTES do código Pix
 function enviarWhatsApp() {
     const pixCode = document.getElementById('pix-payload').value;
     if (!pixCode) return;
 
-    const mensagem = `${pixCode}\n\n(Código Pix Copia e Cola. Toque sobre o código para copiar e cole no app do seu banco na opção Pix Copia e Cola)`;
-    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`;
-    window.open(url, '_blank');
+    const mensagem = `Olá! Segue o Código Pix Copia e Cola para pagamento. Copie o código abaixo e cole na opção Pix Copia e Cola do seu banco:\n\n${pixCode}`;
+
+    if (navigator.share) {
+        navigator.share({
+            text: mensagem
+        }).catch(() => {
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`;
+            window.open(url, '_blank');
+        });
+    } else {
+        const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`;
+        window.open(url, '_blank');
+    }
 }
 </script>
 
