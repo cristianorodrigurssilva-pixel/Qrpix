@@ -28,7 +28,7 @@
         #btn-instalar { background-color: #555; display: none; }
         #qrcode-container { margin-top: 20px; display: flex; justify-content: center; }
         .result-box { display: none; margin-top: 20px; }
-        textarea { width: 100%; height: 80px; margin-top: 8px; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-family: monospace; font-size: 12px; resize: none; background: #f9f9f9; cursor: pointer; }
+        textarea { width: 100%; height: 80px; margin-top: 8px; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-family: monospace; font-size: 12px; resize: none; background: #f9f9f9; }
     </style>
 </head>
 <body>
@@ -67,10 +67,12 @@
 <script>
 // 1. Persistência de Dados (localStorage)
 document.addEventListener('DOMContentLoaded', function() {
+    // Carrega os dados salvos anteriormente
     if (localStorage.getItem('pix_chave')) document.getElementById('chave').value = localStorage.getItem('pix_chave');
     if (localStorage.getItem('pix_nome')) document.getElementById('nome').value = localStorage.getItem('pix_nome');
     if (localStorage.getItem('pix_cidade')) document.getElementById('cidade').value = localStorage.getItem('pix_cidade');
 
+    // Salva automaticamente conforme você digita
     document.getElementById('chave').addEventListener('input', function(e) {
         localStorage.setItem('pix_chave', e.target.value);
     });
@@ -168,41 +170,17 @@ function gerarPix() {
     document.getElementById('result').style.display = 'block';
 }
 
-// Cópia automática ao clicar na caixa de texto
-document.getElementById('pix-payload').addEventListener('click', function() {
-    this.select();
-    this.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(this.value);
-    alert('Código Pix copiado! Cole no app do seu banco na opção Pix Copia e Cola.');
-});
-
-// Botão Copiar
 function copiarPix() {
     const payloadInput = document.getElementById('pix-payload');
     payloadInput.select();
-    payloadInput.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(payloadInput.value);
-    alert('Código Pix copiado! Cole no app do seu banco na opção Pix Copia e Cola.');
+    alert('Código Pix copiado!');
 }
 
-// Envio para o WhatsApp com o texto formatado para cópia rápida
 function enviarWhatsApp() {
     const pixCode = document.getElementById('pix-payload').value;
-    if (!pixCode) return;
-
-    const textoEnvio = `${pixCode}\n\n(Código Pix Copia e Cola. Toque no código para copiar e cole no app do seu banco)`;
-
-    if (navigator.share) {
-        navigator.share({
-            text: textoEnvio
-        }).catch(() => {
-            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoEnvio)}`;
-            window.open(url, '_blank');
-        });
-    } else {
-        const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoEnvio)}`;
-        window.open(url, '_blank');
-    }
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(pixCode)}`;
+    window.open(url, '_blank');
 }
 </script>
 
