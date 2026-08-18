@@ -9,58 +9,76 @@
   <link rel="icon" href="icon-512.png" type="image/png">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-    body { background-color: #f4f6f8; padding: 20px; display: flex; justify-content: center; }
-    .container { background: #ffffff; padding: 25px; border-radius: 12px; max-width: 400px; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
-    h1 { color: #13899C; margin-bottom: 20px; font-size: 24px; }
-    label { display: block; text-align: left; font-weight: bold; margin: 10px 0 5px; color: #333; }
-    input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; margin-bottom: 10px; }
-    button { width: 100%; padding: 12px; background-color: #13899C; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-    button:active { background-color: #0e6877; }
-    #qrcode { margin-top: 20px; display: flex; justify-content: center; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: linear-gradient(135deg, #0e6877, #13899C); min-height: 100vh; padding: 20px; display: flex; justify-content: center; align-items: center; }
+    .card { background: #ffffff; padding: 25px; border-radius: 16px; max-width: 420px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+    h1 { color: #13899C; text-align: center; margin-bottom: 20px; font-size: 26px; font-weight: 700; }
+    .input-group { margin-bottom: 15px; }
+    label { display: block; font-weight: 600; margin-bottom: 6px; color: #444; font-size: 14px; }
+    input, select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; transition: border-color 0.3s; }
+    input:focus, select:focus { border-color: #13899C; outline: none; }
+    .btn { width: 100%; padding: 14px; background: #13899C; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.3s; }
+    .btn:hover { background: #0e6877; }
+    #qrcode { margin-top: 25px; display: flex; justify-content: center; padding: 15px; background: #f9f9f9; border-radius: 8px; }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>Gerador QrPix</h1>
+  <div class="card">
+    <h1>QrPix</h1>
     
-    <label for="chave">Chave PIX:</label>
-    <input type="text" id="chave" placeholder="CPF, CNPJ, E-mail ou Tel">
+    <div class="input-group">
+      <label for="tipoChave">Tipo de Chave:</label>
+      <select id="tipoChave">
+        <option value="cpf">CPF / CNPJ</option>
+        <option value="email">E-mail</option>
+        <option value="telefone">Telefone</option>
+        <option value="aleatoria">Chave Aleatória</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <label for="chave">Chave PIX:</label>
+      <input type="text" id="chave" placeholder="Digite sua chave aqui">
+    </div>
     
-    <label for="valor">Valor (Opcional):</label>
-    <input type="number" id="valor" step="0.01" placeholder="0.00">
+    <div class="input-group">
+      <label for="valor">Valor (R$):</label>
+      <input type="number" id="valor" step="0.01" placeholder="0,00 (Opcional)">
+    </div>
     
-    <button onclick="gerarQR()">Gerar QR Code</button>
+    <button class="btn" onclick="gerarQR()">Gerar QR Code</button>
 
     <div id="qrcode"></div>
   </div>
 
   <script>
-    // Gerador de QR Code
     function gerarQR() {
       const chave = document.getElementById('chave').value.trim();
       const qrContainer = document.getElementById('qrcode');
       qrContainer.innerHTML = "";
 
       if (!chave) {
-        alert("Por favor, digite uma chave PIX.");
+        alert("Por favor, informe a sua chave PIX.");
         return;
       }
 
       new QRCode(qrContainer, {
         text: chave,
-        width: 200,
-        height: 200
+        width: 220,
+        height: 220,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
       });
     }
 
-    // REGISTRO DO SERVICE WORKER (Para funcionamento 100% Offline)
+    // REGISTRO DO SERVICE WORKER (Funcionamento Offline mantido)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then((reg) => console.log('Service Worker ativado!', reg.scope))
-          .catch((err) => console.error('Erro ao registrar SW:', err));
+          .then((reg) => console.log('Service Worker ativo!', reg.scope))
+          .catch((err) => console.error('Erro no SW:', err));
       });
     }
   </script>
