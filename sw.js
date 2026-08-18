@@ -1,68 +1,51 @@
-const CACHE_NAME = "qrpix-v1";
-
-const FILES = [
-  "./",
-  "./index.html",
-  "./manifest.json",
-  "./icon.svg"
+const CACHE_NAME = 'qrpix-cache-v1';
+const ASSETS_TO_CACHE = [
+  './',
+  './index.html',
+  './style.css',
+  './app.js',
+  './manifest.json',
+  './icon-512.png',
+  // Caso use a biblioteca externa de QR Code via CDN, inclua a URL dela aqui:
+  'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js'
 ];
 
-self.addEventListener("install", function(event) {
-
+// Instalação do Service Worker e salvamento no Cache
+self.addEventListener('install', (event) => {
   event.waitUntil(
-
-    caches.open(CACHE_NAME).then(function(cache) {
-
-      return cache.addAll(FILES);
-
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('Arquivos salvos no cache com sucesso!');
+      return cache.addAll(ASSETS_TO_CACHE);
     })
-
   );
-
   self.skipWaiting();
-
 });
 
-
-self.addEventListener("activate", function(event) {
-
+// Ativação e limpeza de caches antigos
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-
-    caches.keys().then(function(names) {
-
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-
-        names.map(function(name) {
-
-          if (name !== CACHE_NAME) {
-
-            return caches.delete(name);
-
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            console.log('Cache antigo removido:', cache);
+            return caches.delete(cache);
           }
-
         })
-
       );
-
     })
-
   );
-
   self.clients.claim();
-
 });
 
-
-self.addEventListener("fetch", function(event) {
-
+// Intercepta as requisições: tenta carregar da rede, se falhar (offline), busca no cache
+self.addEventListener('fetch', (event) => {
   event.respondWith(
-
-    caches.match(event.request).then(function(response) {
-
-      return response || fetch(event.request);
-
+    fetch(event.request).catch(() => {
+      return caches.match(event.request);
     })
-
   );
-
 });
+
+
+  
