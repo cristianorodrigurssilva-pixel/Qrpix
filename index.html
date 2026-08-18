@@ -19,7 +19,12 @@
     input:focus, select:focus { border-color: #13899C; outline: none; }
     .btn { width: 100%; padding: 14px; background: #13899C; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.3s; }
     .btn:hover { background: #0e6877; }
-    #qrcode { margin-top: 25px; display: flex; justify-content: center; padding: 15px; background: #f9f9f9; border-radius: 8px; }
+    .btn-wsp { background: #25D366; margin-top: 8px; }
+    .btn-wsp:hover { background: #1da851; }
+    .btn-copy { background: #555; margin-top: 8px; }
+    .btn-copy:hover { background: #333; }
+    #qrcode { margin-top: 20px; display: flex; justify-content: center; padding: 15px; background: #f9f9f9; border-radius: 8px; }
+    .actions { display: none; margin-top: 15px; }
   </style>
 </head>
 <body>
@@ -50,16 +55,25 @@
     <button class="btn" onclick="gerarQR()">Gerar QR Code</button>
 
     <div id="qrcode"></div>
+
+    <div id="actions" class="actions">
+      <button class="btn btn-copy" onclick="copiarPix()">Copiar Chave Pix</button>
+      <button class="btn btn-wsp" onclick="enviarWhatsapp()">Enviar por WhatsApp</button>
+    </div>
   </div>
 
   <script>
     function gerarQR() {
       const chave = document.getElementById('chave').value.trim();
+      const valor = document.getElementById('valor').value;
       const qrContainer = document.getElementById('qrcode');
+      const actionsDiv = document.getElementById('actions');
+      
       qrContainer.innerHTML = "";
 
       if (!chave) {
         alert("Por favor, informe a sua chave PIX.");
+        actionsDiv.style.display = "none";
         return;
       }
 
@@ -71,9 +85,34 @@
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.H
       });
+
+      actionsDiv.style.display = "block";
     }
 
-    // REGISTRO DO SERVICE WORKER (Funcionamento Offline mantido)
+    function copiarPix() {
+      const chave = document.getElementById('chave').value.trim();
+      if (chave) {
+        navigator.clipboard.writeText(chave);
+        alert("Chave Pix copiada para a área de transferência!");
+      }
+    }
+
+    function enviarWhatsapp() {
+      const chave = document.getElementById('chave').value.trim();
+      const valor = document.getElementById('valor').value;
+      
+      if (!chave) return;
+
+      let mensagem = `Olá! Segue minha chave Pix para pagamento:\n\n*Chave Pix:* ${chave}`;
+      if (valor) {
+        mensagem += `\n*Valor:* R$ ${parseFloat(valor).toFixed(2)}`;
+      }
+
+      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`;
+      window.open(url, '_blank');
+    }
+
+    // REGISTRO DO SERVICE WORKER (Funcionamento Offline)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
