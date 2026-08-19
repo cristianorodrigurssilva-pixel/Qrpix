@@ -1,33 +1,17 @@
 {
-  "id": "com.qrpix.app",
   "name": "QrPix",
   "short_name": "QrPix",
-  "description": "Gerador de QR Code e Código Copia e Cola do Pix rápido e prático.",
+  "description": "Gerador de QR Code Pix",
   "start_url": "./index.html",
-  "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#32BCAD",
-  "lang": "pt-BR",
+  "background_color": "#7C3AED",
+  "theme_color": "#7C3AED",
   "icons": [
     {
-      "src": "icon-512.png",
+      "src": "./icon.svg?v=2",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "icon.svg",
-      "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ]
 }
