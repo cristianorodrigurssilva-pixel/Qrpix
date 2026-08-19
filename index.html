@@ -7,7 +7,7 @@
     
     <!-- Configurações PWA -->
     <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#32BCAD">
+    <meta name="theme-color" content="#0F172A">
     <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Logo_do_Pix.svg/1200px-Logo_do_Pix.svg.png">
 
     <!-- Biblioteca QR Code -->
@@ -16,9 +16,9 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         
-        /* Fundo claro e agradável */
+        /* Fundo da Tela: Cinza Gelo Suave */
         body { 
-            background-color: #f4f6f9; 
+            background-color: #F0F4F8; 
             padding: 20px; 
             display: flex; 
             justify-content: center; 
@@ -26,54 +26,56 @@
             min-height: 100vh;
         }
         
-        /* Container claro e limpo */
+        /* Container claro e elegante */
         .container { 
             background: #ffffff; 
             padding: 25px; 
             border-radius: 16px; 
             max-width: 450px; 
             width: 100%; 
-            box-shadow: 0 10px 25px rgba(24, 24, 36, 0.08); 
-            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08); 
+            border: 1px solid #E2E8F0;
         }
         
-        /* Título usando o tom escuro do ícone + verde Pix */
+        /* Título em Azul Grafite com 'Pix' em Verde Esmeralda */
         h1 { 
             font-size: 28px; 
             font-weight: bold; 
-            color: #181824; 
+            color: #0F172A; 
             margin-bottom: 20px; 
             text-align: center;
             letter-spacing: 0.5px;
         }
         .pix-color {
-            color: #32BCAD;
+            color: #059669; /* Verde Esmeralda */
         }
 
-        label { font-size: 14px; font-weight: 600; color: #4a5568; display: block; margin-top: 14px; }
+        /* Textos e Rótulos em Azul Grafite Escuro */
+        label { font-size: 14px; font-weight: 600; color: #0F172A; display: block; margin-top: 14px; }
         
-        /* Campos de texto claros com foco no verde Pix */
+        /* Campos de texto com borda e foco em Verde Esmeralda */
         input { 
             width: 100%; 
             padding: 12px; 
             margin-top: 6px; 
-            border: 1px solid #cbd5e1; 
+            border: 1px solid #CBD5E1; 
             border-radius: 8px; 
             font-size: 16px; 
             background: #ffffff; 
-            color: #181824;
+            color: #0F172A;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
         input:focus {
             outline: none;
-            border-color: #32BCAD;
-            box-shadow: 0 0 0 3px rgba(50, 188, 173, 0.15);
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
         }
 
+        /* Botão Principal: Verde Esmeralda */
         button { 
             width: 100%; 
             padding: 14px; 
-            background-color: #32BCAD; 
+            background-color: #059669; 
             color: white; 
             border: none; 
             border-radius: 8px; 
@@ -83,14 +85,14 @@
             cursor: pointer; 
             transition: background 0.2s;
         }
-        button:hover { background-color: #28998c; }
+        button:hover { background-color: #047857; }
         
         .btn-whatsapp { background-color: #25d366; margin-top: 10px; }
         .btn-whatsapp:hover { background-color: #1eb954; }
         
-        /* Botão de instalação com tom Coral Red do ícone */
-        #btn-instalar { background-color: #FF6B6B; display: none; }
-        #btn-instalar:hover { background-color: #e05b5b; }
+        /* Botão de instalação com tom de Azul Cobalto complementar */
+        #btn-instalar { background-color: #3B82F6; display: none; }
+        #btn-instalar:hover { background-color: #2563EB; }
         
         #qrcode-container { 
             margin-top: 20px; 
@@ -108,12 +110,12 @@
             margin-top: 8px; 
             padding: 10px; 
             border-radius: 8px; 
-            border: 1px solid #cbd5e1; 
+            border: 1px solid #CBD5E1; 
             font-family: monospace; 
             font-size: 12px; 
             resize: none; 
-            background: #f8fafc; 
-            color: #181824;
+            background: #F8FAFC; 
+            color: #0F172A;
         }
     </style>
 </head>
