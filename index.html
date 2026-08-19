@@ -7,7 +7,7 @@
     
     <!-- Configurações PWA -->
     <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#0F172A">
+    <meta name="theme-color" content="#1E1B4B">
     <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Logo_do_Pix.svg/1200px-Logo_do_Pix.svg.png">
 
     <!-- Biblioteca QR Code -->
@@ -16,9 +16,9 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         
-        /* Fundo da Tela: Cinza Gelo Suave */
+        /* Fundo da Tela: Pérola Claríssimo */
         body { 
-            background-color: #F0F4F8; 
+            background-color: #F8FAFC; 
             padding: 20px; 
             display: flex; 
             justify-content: center; 
@@ -26,34 +26,34 @@
             min-height: 100vh;
         }
         
-        /* Container claro e elegante */
+        /* Container claro e limpo */
         .container { 
             background: #ffffff; 
             padding: 25px; 
             border-radius: 16px; 
             max-width: 450px; 
             width: 100%; 
-            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08); 
+            box-shadow: 0 10px 25px rgba(30, 27, 75, 0.08); 
             border: 1px solid #E2E8F0;
         }
         
-        /* Título em Azul Grafite com 'Pix' em Verde Esmeralda */
+        /* Título em Índigo Noturno com 'Pix' em Ciano Neon */
         h1 { 
             font-size: 28px; 
             font-weight: bold; 
-            color: #0F172A; 
+            color: #1E1B4B; 
             margin-bottom: 20px; 
             text-align: center;
             letter-spacing: 0.5px;
         }
         .pix-color {
-            color: #059669; /* Verde Esmeralda */
+            color: #00D2B8; /* Ciano / Turquesa Neon */
         }
 
-        /* Textos e Rótulos em Azul Grafite Escuro */
-        label { font-size: 14px; font-weight: 600; color: #0F172A; display: block; margin-top: 14px; }
+        /* Textos e Rótulos em Índigo Noturno */
+        label { font-size: 14px; font-weight: 600; color: #1E1B4B; display: block; margin-top: 14px; }
         
-        /* Campos de texto com borda e foco em Verde Esmeralda */
+        /* Campos de texto com borda e foco em Ciano Neon */
         input { 
             width: 100%; 
             padding: 12px; 
@@ -62,21 +62,21 @@
             border-radius: 8px; 
             font-size: 16px; 
             background: #ffffff; 
-            color: #0F172A;
+            color: #1E1B4B;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
         input:focus {
             outline: none;
-            border-color: #059669;
-            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+            border-color: #00D2B8;
+            box-shadow: 0 0 0 3px rgba(0, 210, 184, 0.2);
         }
 
-        /* Botão Principal: Verde Esmeralda */
+        /* Botão Principal: Ciano Neon com Texto Escuro para Alto Contraste */
         button { 
             width: 100%; 
             padding: 14px; 
-            background-color: #059669; 
-            color: white; 
+            background-color: #00D2B8; 
+            color: #0F172A; 
             border: none; 
             border-radius: 8px; 
             font-size: 16px; 
@@ -85,14 +85,14 @@
             cursor: pointer; 
             transition: background 0.2s;
         }
-        button:hover { background-color: #047857; }
+        button:hover { background-color: #00B8A2; }
         
-        .btn-whatsapp { background-color: #25d366; margin-top: 10px; }
+        .btn-whatsapp { background-color: #25d366; color: white; margin-top: 10px; }
         .btn-whatsapp:hover { background-color: #1eb954; }
         
-        /* Botão de instalação com tom de Azul Cobalto complementar */
-        #btn-instalar { background-color: #3B82F6; display: none; }
-        #btn-instalar:hover { background-color: #2563EB; }
+        /* Botão de instalação com tom Coral Vibrante */
+        #btn-instalar { background-color: #FF5A5F; color: white; display: none; }
+        #btn-instalar:hover { background-color: #E0484D; }
         
         #qrcode-container { 
             margin-top: 20px; 
@@ -115,7 +115,7 @@
             font-size: 12px; 
             resize: none; 
             background: #F8FAFC; 
-            color: #0F172A;
+            color: #1E1B4B;
         }
     </style>
 </head>
