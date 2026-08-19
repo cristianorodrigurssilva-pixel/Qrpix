@@ -84,7 +84,7 @@
             font-weight: bold; 
             margin-top: 20px; 
             cursor: pointer; 
-            transition: background 0.2s, transform 0.1s;
+            transition: background 0.2s, transform 0.1s, color 0.2s;
         }
         button:hover { background-color: #6d28d9; }
         button:active { transform: scale(0.99); }
@@ -122,18 +122,23 @@
             color: #3b0764;
         }
 
-        /* Estilo da Notificação Personalizada (Toast) */
+        /* Notificação Flutuante no Centro Inferior da Tela */
         .toast {
             display: none;
-            background-color: #7c3aed;
-            color: #ffffff;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #00d2b8;
+            color: #0f172a;
+            padding: 14px 24px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            z-index: 9999;
             text-align: center;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
-            margin-top: 15px;
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+            white-space: nowrap;
         }
         .toast.show { display: block; }
     </style>
@@ -166,13 +171,13 @@
         <label for="pix-payload">Código Pix Copia e Cola:</label>
         <textarea id="pix-payload" readonly></textarea>
         
-        <button type="button" onclick="copiarPix()">Copiar Código Pix</button>
+        <button type="button" id="btn-copiar" onclick="copiarPix()">Copiar Código Pix</button>
         <button type="button" class="btn-whatsapp" onclick="enviarWhatsApp()">Enviar no WhatsApp</button>
-        
-        <!-- Elemento de Notificação Personalizada -->
-        <div id="toast" class="toast">✓ Código Pix copiado!</div>
     </div>
 </div>
+
+<!-- Elemento de Notificação Flutuante na Tela -->
+<div id="toast" class="toast">✓ Código Pix copiado!</div>
 
 <script>
 // 1. Persistência de Dados (localStorage)
@@ -284,10 +289,22 @@ function gerarPix() {
 
 function mostrarAviso() {
     const toast = document.getElementById('toast');
+    const btn = document.getElementById('btn-copiar');
+    
+    // Notificação flutuante
     toast.classList.add('show');
+    
+    // Destaque visual no botão
+    btn.innerText = '✓ Código Copiado!';
+    btn.style.backgroundColor = '#00d2b8';
+    btn.style.color = '#0f172a';
+
     setTimeout(function() {
         toast.classList.remove('show');
-    }, 2500);
+        btn.innerText = 'Copiar Código Pix';
+        btn.style.backgroundColor = '#7c3aed';
+        btn.style.color = '#ffffff';
+    }, 2200);
 }
 
 function copiarPix() {
