@@ -7,7 +7,7 @@
     
     <!-- Configurações PWA -->
     <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#1E1B4B">
+    <meta name="theme-color" content="#7C3AED">
     <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Logo_do_Pix.svg/1200px-Logo_do_Pix.svg.png">
 
     <!-- Biblioteca QR Code -->
@@ -16,9 +16,9 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         
-        /* Fundo da Tela: Pérola Claríssimo */
+        /* Fundo da Tela: Lilás Suave Alegre */
         body { 
-            background-color: #F8FAFC; 
+            background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%); 
             padding: 20px; 
             display: flex; 
             justify-content: center; 
@@ -26,80 +26,84 @@
             min-height: 100vh;
         }
         
-        /* Container claro e limpo */
+        /* Container claro com sombra colorida sutil */
         .container { 
             background: #ffffff; 
             padding: 25px; 
-            border-radius: 16px; 
+            border-radius: 20px; 
             max-width: 450px; 
             width: 100%; 
-            box-shadow: 0 10px 25px rgba(30, 27, 75, 0.08); 
-            border: 1px solid #E2E8F0;
+            box-shadow: 0 12px 30px rgba(124, 58, 237, 0.12); 
+            border: 1px solid #e9d5ff;
         }
         
-        /* Título em Índigo Noturno com 'Pix' em Ciano Neon */
+        /* Título Roxo Vivo com 'Pix' em Turquesa Elétrico */
         h1 { 
-            font-size: 28px; 
-            font-weight: bold; 
-            color: #1E1B4B; 
+            font-size: 30px; 
+            font-weight: 800; 
+            color: #6b21a8; 
             margin-bottom: 20px; 
             text-align: center;
             letter-spacing: 0.5px;
         }
         .pix-color {
-            color: #00D2B8; /* Ciano / Turquesa Neon */
+            color: #00d2b8; /* Turquesa / Ciano Elétrico */
         }
 
-        /* Textos e Rótulos em Índigo Noturno */
-        label { font-size: 14px; font-weight: 600; color: #1E1B4B; display: block; margin-top: 14px; }
+        /* Textos e Rótulos em Roxo Escuro Legível */
+        label { font-size: 14px; font-weight: 700; color: #4c1d95; display: block; margin-top: 14px; }
         
-        /* Campos de texto com borda e foco em Ciano Neon */
+        /* Campos de texto com borda e foco em Violeta */
         input { 
             width: 100%; 
             padding: 12px; 
             margin-top: 6px; 
-            border: 1px solid #CBD5E1; 
-            border-radius: 8px; 
+            border: 2px solid #e9d5ff; 
+            border-radius: 10px; 
             font-size: 16px; 
-            background: #ffffff; 
-            color: #1E1B4B;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #faf5ff; 
+            color: #3b0764;
+            transition: all 0.2s;
         }
         input:focus {
             outline: none;
-            border-color: #00D2B8;
-            box-shadow: 0 0 0 3px rgba(0, 210, 184, 0.2);
+            border-color: #8b5cf6;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.18);
         }
 
-        /* Botão Principal: Ciano Neon com Texto Escuro para Alto Contraste */
+        /* Botão Principal: Violeta Vibrante */
         button { 
             width: 100%; 
             padding: 14px; 
-            background-color: #00D2B8; 
-            color: #0F172A; 
+            background-color: #7c3aed; 
+            color: white; 
             border: none; 
-            border-radius: 8px; 
+            border-radius: 10px; 
             font-size: 16px; 
             font-weight: bold; 
             margin-top: 20px; 
             cursor: pointer; 
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.1s;
         }
-        button:hover { background-color: #00B8A2; }
+        button:hover { background-color: #6d28d9; }
+        button:active { transform: scale(0.99); }
         
         .btn-whatsapp { background-color: #25d366; color: white; margin-top: 10px; }
         .btn-whatsapp:hover { background-color: #1eb954; }
         
-        /* Botão de instalação com tom Coral Vibrante */
-        #btn-instalar { background-color: #FF5A5F; color: white; display: none; }
-        #btn-instalar:hover { background-color: #E0484D; }
+        /* Botão de instalação em Laranja / Coral Vivo */
+        #btn-instalar { background-color: #f97316; color: white; display: none; }
+        #btn-instalar:hover { background-color: #ea580c; }
         
         #qrcode-container { 
             margin-top: 20px; 
             display: flex; 
             justify-content: center; 
             background: #ffffff; 
-            padding: 10px;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px dashed #c084fc;
         }
         
         .result-box { display: none; margin-top: 20px; }
@@ -109,13 +113,13 @@
             height: 85px; 
             margin-top: 8px; 
             padding: 10px; 
-            border-radius: 8px; 
-            border: 1px solid #CBD5E1; 
+            border-radius: 10px; 
+            border: 2px solid #e9d5ff; 
             font-family: monospace; 
             font-size: 12px; 
             resize: none; 
-            background: #F8FAFC; 
-            color: #1E1B4B;
+            background: #faf5ff; 
+            color: #3b0764;
         }
     </style>
 </head>
@@ -291,3 +295,4 @@ function enviarWhatsApp() {
 
 </body>
 </html>
+     
