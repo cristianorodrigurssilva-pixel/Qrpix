@@ -8,7 +8,6 @@
     <!-- Configurações PWA -->
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#7C3AED">
-    <!-- Ícone apontando para o arquivo SVG com ?v=2 para atualizar o cache do navegador e do PWA -->
     <link rel="icon" type="image/svg+xml" href="./icon.svg?v=2">
 
     <!-- Biblioteca QR Code -->
@@ -122,6 +121,21 @@
             background: #faf5ff; 
             color: #3b0764;
         }
+
+        /* Estilo da Notificação Personalizada (Toast) */
+        .toast {
+            display: none;
+            background-color: #7c3aed;
+            color: #ffffff;
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 15px;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+        }
+        .toast.show { display: block; }
     </style>
 </head>
 <body>
@@ -154,6 +168,9 @@
         
         <button type="button" onclick="copiarPix()">Copiar Código Pix</button>
         <button type="button" class="btn-whatsapp" onclick="enviarWhatsApp()">Enviar no WhatsApp</button>
+        
+        <!-- Elemento de Notificação Personalizada -->
+        <div id="toast" class="toast">✓ Código Pix copiado!</div>
     </div>
 </div>
 
@@ -265,6 +282,14 @@ function gerarPix() {
     document.getElementById('result').style.display = 'block';
 }
 
+function mostrarAviso() {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(function() {
+        toast.classList.remove('show');
+    }, 2500);
+}
+
 function copiarPix() {
     const payloadInput = document.getElementById('pix-payload');
     if (!payloadInput.value) return;
@@ -275,14 +300,14 @@ function copiarPix() {
 
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(payloadInput.value).then(function() {
-            alert('Código Pix copiado!');
+            mostrarAviso();
         }).catch(function() {
             document.execCommand('copy');
-            alert('Código Pix copiado!');
+            mostrarAviso();
         });
     } else {
         document.execCommand('copy');
-        alert('Código Pix copiado!');
+        mostrarAviso();
     }
 }
 
