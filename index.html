@@ -7,7 +7,7 @@
     
     <!-- Configurações PWA -->
     <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#7C3AED">
+    <meta name="theme-color" content="#2563eb">
     <link rel="icon" type="image/svg+xml" href="./icon.svg?v=2">
 
     <!-- Biblioteca QR Code -->
@@ -16,9 +16,9 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         
-        /* Fundo da Tela: Lilás Suave Alegre */
+        /* Fundo da Tela: Azul Tecnológico Suave */
         body { 
-            background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%); 
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); 
             padding: 20px; 
             display: flex; 
             justify-content: center; 
@@ -26,57 +26,57 @@
             min-height: 100vh;
         }
         
-        /* Container claro com sombra colorida sutil */
+        /* Container claro com sombra azul sutil */
         .container { 
             background: #ffffff; 
             padding: 25px; 
             border-radius: 20px; 
             max-width: 450px; 
             width: 100%; 
-            box-shadow: 0 12px 30px rgba(124, 58, 237, 0.12); 
-            border: 1px solid #e9d5ff;
+            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.12); 
+            border: 1px solid #bfdbfe;
         }
         
-        /* Título Roxo Vivo com 'Pix' em Turquesa Elétrico */
+        /* Título Azul Marinho com 'Pix' em Ciano Neon */
         h1 { 
             font-size: 30px; 
             font-weight: 800; 
-            color: #6b21a8; 
+            color: #1e3a8a; 
             margin-bottom: 20px; 
             text-align: center;
             letter-spacing: 0.5px;
         }
         .pix-color {
-            color: #00d2b8; /* Turquesa / Ciano Elétrico */
+            color: #06b6d4; /* Ciano Neon */
         }
 
-        /* Textos e Rótulos em Roxo Escuro Legível */
-        label { font-size: 14px; font-weight: 700; color: #4c1d95; display: block; margin-top: 14px; }
+        /* Textos e Rótulos em Azul Escuro Legível */
+        label { font-size: 14px; font-weight: 700; color: #1e3a8a; display: block; margin-top: 14px; }
         
-        /* Campos de texto com borda e foco em Violeta */
+        /* Campos de texto com borda e foco em Azul */
         input { 
             width: 100%; 
             padding: 12px; 
             margin-top: 6px; 
-            border: 2px solid #e9d5ff; 
+            border: 2px solid #bfdbfe; 
             border-radius: 10px; 
             font-size: 16px; 
-            background: #faf5ff; 
-            color: #3b0764;
+            background: #f8fafc; 
+            color: #1e293b;
             transition: all 0.2s;
         }
         input:focus {
             outline: none;
-            border-color: #8b5cf6;
+            border-color: #2563eb;
             background: #ffffff;
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.18);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
         }
 
-        /* Botão Principal: Violeta Vibrante */
+        /* Botão Principal: Azul Royal */
         button { 
             width: 100%; 
             padding: 14px; 
-            background-color: #7c3aed; 
+            background-color: #2563eb; 
             color: white; 
             border: none; 
             border-radius: 10px; 
@@ -86,15 +86,15 @@
             cursor: pointer; 
             transition: background 0.2s, transform 0.1s, color 0.2s;
         }
-        button:hover { background-color: #6d28d9; }
+        button:hover { background-color: #1d4ed8; }
         button:active { transform: scale(0.99); }
         
         .btn-whatsapp { background-color: #25d366; color: white; margin-top: 10px; }
         .btn-whatsapp:hover { background-color: #1eb954; }
         
-        /* Botão de instalação em Laranja / Coral Vivo */
-        #btn-instalar { background-color: #f97316; color: white; display: none; }
-        #btn-instalar:hover { background-color: #ea580c; }
+        /* Botão de instalação em Azul Escuro */
+        #btn-instalar { background-color: #0f172a; color: white; display: none; }
+        #btn-instalar:hover { background-color: #1e293b; }
         
         #qrcode-container { 
             margin-top: 20px; 
@@ -103,7 +103,7 @@
             background: #ffffff; 
             padding: 12px;
             border-radius: 12px;
-            border: 1px dashed #c084fc;
+            border: 1px dashed #38bdf8;
         }
         
         .result-box { display: none; margin-top: 20px; }
@@ -114,12 +114,12 @@
             margin-top: 8px; 
             padding: 10px; 
             border-radius: 10px; 
-            border: 2px solid #e9d5ff; 
+            border: 2px solid #bfdbfe; 
             font-family: monospace; 
             font-size: 12px; 
             resize: none; 
-            background: #faf5ff; 
-            color: #3b0764;
+            background: #f8fafc; 
+            color: #1e3a8a;
         }
 
         /* Notificação Flutuante no Centro Inferior da Tela */
@@ -129,7 +129,7 @@
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #00d2b8;
+            background-color: #06b6d4;
             color: #0f172a;
             padding: 14px 24px;
             border-radius: 30px;
@@ -296,13 +296,13 @@ function mostrarAviso() {
     
     // Destaque visual no botão
     btn.innerText = '✓ Código Copiado!';
-    btn.style.backgroundColor = '#00d2b8';
+    btn.style.backgroundColor = '#06b6d4';
     btn.style.color = '#0f172a';
 
     setTimeout(function() {
         toast.classList.remove('show');
         btn.innerText = 'Copiar Código Pix';
-        btn.style.backgroundColor = '#7c3aed';
+        btn.style.backgroundColor = '#2563eb';
         btn.style.color = '#ffffff';
     }, 2200);
 }
