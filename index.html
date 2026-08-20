@@ -257,11 +257,26 @@ function formatField(id, value) {
     return id + len + value;
 }
 
+// Função auxiliar para remover acentos e caracteres especiais para evitar travamentos nos bancos
+function limparTexto(texto) {
+    return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9 ]/g, "");
+}
+
 function gerarPix() {
-    const chave = document.getElementById('chave').value.trim();
-    const nome = document.getElementById('nome').value.trim();
-    const cidade = document.getElementById('cidade').value.trim();
+    let chave = document.getElementById('chave').value.trim();
+    let nome = limparTexto(document.getElementById('nome').value.trim());
+    let cidade = limparTexto(document.getElementById('cidade').value.trim());
     let valor = document.getElementById('valor').value.replace(/\./g, '').replace(',', '.').trim();
+
+    // Tratamento básico para formatação de telefone se não for e-mail ou UUID
+    if (!chave.includes('@') && !chave.includes('-')) {
+        let chaveApenasNums = chave.replace(/\D/g, '');
+        if (chaveApenasNums.length === 10 || chaveApenasNums.length === 11) {
+            chave = '+55' + chaveApenasNums;
+        } else if (chaveApenasNums.length === 11 && chave.startsWith('0')) {
+            chave = '+55' + chaveApenasNums.substring(1);
+        }
+    }
 
     if (!chave || !nome || !cidade) {
         alert('Por favor, preencha a chave Pix, o nome e a cidade.');
