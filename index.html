@@ -257,7 +257,6 @@ function formatField(id, value) {
     return id + len + value;
 }
 
-// Função auxiliar para remover acentos e caracteres especiais para evitar travamentos nos bancos
 function limparTexto(texto) {
     return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9 ]/g, "");
 }
@@ -268,13 +267,11 @@ function gerarPix() {
     let cidade = limparTexto(document.getElementById('cidade').value.trim());
     let valor = document.getElementById('valor').value.replace(/\./g, '').replace(',', '.').trim();
 
-    // Tratamento básico para formatação de telefone se não for e-mail ou UUID
+    // Tratamento estrito da Chave
     if (!chave.includes('@') && !chave.includes('-')) {
         let chaveApenasNums = chave.replace(/\D/g, '');
         if (chaveApenasNums.length === 10 || chaveApenasNums.length === 11) {
             chave = '+55' + chaveApenasNums;
-        } else if (chaveApenasNums.length === 11 && chave.startsWith('0')) {
-            chave = '+55' + chaveApenasNums.substring(1);
         }
     }
 
@@ -284,7 +281,9 @@ function gerarPix() {
     }
 
     let merchantAccount = formatField('00', 'BR.GOV.BCB.PIX') + formatField('01', chave);
-    let payload = formatField('00', '01') + formatField('26', merchantAccount) + formatField('52', '0000') + formatField('53', '986');
+    
+    // Campo 00: '01' | Campo 01: '11' (Indica Pix Estático Reutilizável segundo o padrão EMV)
+    let payload = formatField('00', '01') + formatField('01', '11') + formatField('26', merchantAccount) + formatField('52', '0000') + formatField('53', '986');
 
     if (valor && !isNaN(valor) && parseFloat(valor) > 0) {
         payload += formatField('54', parseFloat(valor).toFixed(2));
@@ -306,10 +305,7 @@ function mostrarAviso() {
     const toast = document.getElementById('toast');
     const btn = document.getElementById('btn-copiar');
     
-    // Notificação flutuante
     toast.classList.add('show');
-    
-    // Destaque visual no botão
     btn.innerText = '✓ Código Copiado!';
     btn.style.backgroundColor = '#06b6d4';
     btn.style.color = '#0f172a';
@@ -324,27 +320,29 @@ function mostrarAviso() {
 
 function copiarPix() {
     const payloadInput = document.getElementById('pix-payload');
-    if (!payloadInput.value) return;
+    const texto = payloadInput.value.trim();
 
+    if (!texto) return;
+
+    payloadInput.value = texto;
     payloadInput.focus();
     payloadInput.select();
     payloadInput.setSelectionRange(0, 99999);
 
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(payloadInput.value).then(function() {
-            mostrarAviso();
-        }).catch(function() {
-            document.execCommand('copy');
-            mostrarAviso();
-        });
-    } else {
+    // Método direto para garantir a detecção nativa em aplicativos mobile
+    try {
         document.execCommand('copy');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(texto);
+        }
+        mostrarAviso();
+    } catch (err) {
         mostrarAviso();
     }
 }
 
 function enviarWhatsApp() {
-    const pixCode = document.getElementById('pix-payload').value;
+    const pixCode = document.getElementById('pix-payload').value.trim();
     if (!pixCode) return;
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(pixCode)}`;
     window.open(url, '_blank');
