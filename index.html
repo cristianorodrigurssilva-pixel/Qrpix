@@ -239,7 +239,7 @@ document.getElementById('valor').addEventListener('input', function(e) {
     e.target.value = v;
 });
 
-// 5. Algoritmo Pix
+// 5. Algoritmo Pix Padrão
 function CRC16(str) {
     let crc = 0xFFFF;
     for (let c = 0; c < str.length; c++) {
@@ -257,29 +257,30 @@ function formatField(id, value) {
     return id + len + value;
 }
 
-// Limpeza estrita de texto conforme especificação do Banco Central
+// Sanitização de Texto
 function limparTexto(texto) {
     if (!texto) return '';
-    // Substitui o caractere '&' por 'E'
     let t = texto.replace(/&/g, 'E');
-    // Remove acentos
     t = t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    // Mantém apenas letras, números e espaços
     t = t.replace(/[^a-zA-Z0-9 ]/g, "");
     return t.trim();
 }
 
 function gerarPix() {
     let chave = document.getElementById('chave').value.trim();
-    let nome = limparTexto(document.getElementById('nome').value);
-    let cidade = limparTexto(document.getElementById('cidade').value);
+    let nomeOriginal = document.getElementById('nome').value;
+    let cidadeOriginal = document.getElementById('cidade').value;
     let valor = document.getElementById('valor').value.replace(/\./g, '').replace(',', '.').trim();
 
-    // Tratamento estrito da Chave Celular/CPF
+    // Sanitiza nome e cidade e limita ao tamanho máximo EXATO permitido
+    let nome = limparTexto(nomeOriginal).substring(0, 25);
+    let cidade = limparTexto(cidadeOriginal).substring(0, 15);
+
+    // Ajusta o formato do telefone se necessário (se for celular apenas com DDD)
     if (!chave.includes('@') && !chave.includes('-')) {
-        let chaveApenasNums = chave.replace(/\D/g, '');
-        if (chaveApenasNums.length === 10 || chaveApenasNums.length === 11) {
-            chave = '+55' + chaveApenasNums;
+        let apenasNumeros = chave.replace(/\D/g, '');
+        if (apenasNumeros.length === 10 || apenasNumeros.length === 11) {
+            chave = '+55' + apenasNumeros;
         }
     }
 
@@ -288,17 +289,25 @@ function gerarPix() {
         return;
     }
 
+    // Montagem da estrutura EMV Pix Oficial
     let merchantAccount = formatField('00', 'BR.GOV.BCB.PIX') + formatField('01', chave);
     
-    // Campo 00: '01' | Campo 01: '11' (Pix Estático Reutilizável)
-    let payload = formatField('00', '01') + formatField('01', '11') + formatField('26', merchantAccount) + formatField('52', '0000') + formatField('53', '986');
+    let payload = formatField('00', '01') + 
+                  formatField('26', merchantAccount) + 
+                  formatField('52', '0000') + 
+                  formatField('53', '986');
 
     if (valor && !isNaN(valor) && parseFloat(valor) > 0) {
         payload += formatField('54', parseFloat(valor).toFixed(2));
     }
 
-    payload += formatField('58', 'BR') + formatField('59', nome.substring(0, 25)) + formatField('60', cidade.substring(0, 15)) + formatField('62', formatField('05', '***')) + '6304';
+    payload += formatField('58', 'BR') + 
+               formatField('59', nome) + 
+               formatField('60', cidade) + 
+               formatField('62', formatField('05', '***')) + 
+               '6304';
 
+    // Cálculo exato do checksum CRC16
     const crc = CRC16(payload);
     const pixCompleto = payload + crc;
 
@@ -338,12 +347,14 @@ function copiarPix() {
     payloadInput.setSelectionRange(0, 99999);
 
     try {
-        document.execCommand('copy');
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(texto);
+        } else {
+            document.execCommand('copy');
         }
         mostrarAviso();
     } catch (err) {
+        document.execCommand('copy');
         mostrarAviso();
     }
 }
