@@ -257,17 +257,25 @@ function formatField(id, value) {
     return id + len + value;
 }
 
+// Limpeza estrita de texto conforme especificação do Banco Central
 function limparTexto(texto) {
-    return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9 ]/g, "");
+    if (!texto) return '';
+    // Substitui o caractere '&' por 'E'
+    let t = texto.replace(/&/g, 'E');
+    // Remove acentos
+    t = t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    // Mantém apenas letras, números e espaços
+    t = t.replace(/[^a-zA-Z0-9 ]/g, "");
+    return t.trim();
 }
 
 function gerarPix() {
     let chave = document.getElementById('chave').value.trim();
-    let nome = limparTexto(document.getElementById('nome').value.trim());
-    let cidade = limparTexto(document.getElementById('cidade').value.trim());
+    let nome = limparTexto(document.getElementById('nome').value);
+    let cidade = limparTexto(document.getElementById('cidade').value);
     let valor = document.getElementById('valor').value.replace(/\./g, '').replace(',', '.').trim();
 
-    // Tratamento estrito da Chave
+    // Tratamento estrito da Chave Celular/CPF
     if (!chave.includes('@') && !chave.includes('-')) {
         let chaveApenasNums = chave.replace(/\D/g, '');
         if (chaveApenasNums.length === 10 || chaveApenasNums.length === 11) {
@@ -282,7 +290,7 @@ function gerarPix() {
 
     let merchantAccount = formatField('00', 'BR.GOV.BCB.PIX') + formatField('01', chave);
     
-    // Campo 00: '01' | Campo 01: '11' (Indica Pix Estático Reutilizável segundo o padrão EMV)
+    // Campo 00: '01' | Campo 01: '11' (Pix Estático Reutilizável)
     let payload = formatField('00', '01') + formatField('01', '11') + formatField('26', merchantAccount) + formatField('52', '0000') + formatField('53', '986');
 
     if (valor && !isNaN(valor) && parseFloat(valor) > 0) {
@@ -329,7 +337,6 @@ function copiarPix() {
     payloadInput.select();
     payloadInput.setSelectionRange(0, 99999);
 
-    // Método direto para garantir a detecção nativa em aplicativos mobile
     try {
         document.execCommand('copy');
         if (navigator.clipboard && navigator.clipboard.writeText) {
