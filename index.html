@@ -168,27 +168,105 @@
 <div id="toast" class="toast">✓ Código Pix copiado!</div>
 
 <script>
-// 1. Persistência de Dados
-document.addEventListener('DOMContentLoaded', function() {
-    if (localStorage.getItem('pix_chave')) document.getElementById('chave').value = localStorage.getItem('pix_chave');
-    if (localStorage.getItem('pix_nome')) document.getElementById('nome').value = localStorage.getItem('pix_nome');
-    if (localStorage.getItem('pix_cidade')) document.getElementById('cidade').value = localStorage.getItem('pix_cidade');
+// --- SISTEMA DE BANCO DE DADOS PERSISTENTE (IndexedDB + localStorage) ---
+let db;
+const dbName = "QrPixDatabase";
 
-    document.getElementById('chave').addEventListener('input', function(e) { localStorage.setItem('pix_chave', e.target.value); });
-    document.getElementById('nome').addEventListener('input', function(e) { localStorage.setItem('pix_nome', e.target.value); });
-    document.getElementById('cidade').addEventListener('input', function(e) { localStorage.setItem('pix_cidade', e.target.value); });
+function iniciarBanco() {
+    return new Promise((resolve) => {
+        const request = indexedDB.open(dbName, 1);
+        request.onupgradeneeded = function(e) {
+            let db = e.target.result;
+            if (!db.objectStoreNames.contains("dados")) {
+                db.createObjectStore("dados", { keyPath: "campo" });
+            }
+        };
+        request.onsuccess = function(e) {
+            db = e.target.result;
+            resolve();
+        };
+        request.onerror = function() {
+            resolve(); // fallback para localStorage em caso de bloqueio
+        };
+    });
+}
+
+function salvarDado(campo, valor) {
+    // 1. Salva no localStorage
+    localStorage.setItem('pix_' + campo, valor);
+
+    // 2. Salva no IndexedDB (Mais resistente contra limpezas do sistema)
+    if (db) {
+        try {
+            const tx = db.transaction("dados", "readwrite");
+            const store = tx.objectStore("dados");
+            store.put({ campo: campo, valor: valor });
+        } catch (err) {}
+    }
+}
+
+function carregarDados() {
+    // Primeiro tenta ler do localStorage
+    let chave = localStorage.getItem('pix_chave');
+    let nome = localStorage.getItem('pix_nome');
+    let cidade = localStorage.getItem('pix_cidade');
+
+    if (chave) document.getElementById('chave').value = chave;
+    if (nome) document.getElementById('nome').value = nome;
+    if (cidade) document.getElementById('cidade').value = cidade;
+
+    // Se faltar algum dado no localStorage, busca do IndexedDB
+    if (db && (!chave || !nome || !cidade)) {
+        try {
+            const tx = db.transaction("dados", "readonly");
+            const store = tx.objectStore("dados");
+            
+            store.get("chave").onsuccess = (e) => {
+                if (e.target.result && !document.getElementById('chave').value) {
+                    document.getElementById('chave').value = e.target.result.valor;
+                    localStorage.setItem('pix_chave', e.target.result.valor);
+                }
+            };
+            store.get("nome").onsuccess = (e) => {
+                if (e.target.result && !document.getElementById('nome').value) {
+                    document.getElementById('nome').value = e.target.result.valor;
+                    localStorage.setItem('pix_nome', e.target.result.valor);
+                }
+            };
+            store.get("cidade").onsuccess = (e) => {
+                if (e.target.result && !document.getElementById('cidade').value) {
+                    document.getElementById('cidade').value = e.target.result.valor;
+                    localStorage.setItem('pix_cidade', e.target.result.valor);
+                }
+            };
+        } catch (err) {}
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+    await iniciarBanco();
+    carregarDados();
+
+    // Solicita ao navegador permissão para armazenamento persistente (evita exclusão automática)
+    if (navigator.storage && navigator.storage.persist) {
+        navigator.storage.persist();
+    }
+
+    document.getElementById('chave').addEventListener('input', (e) => salvarDado('chave', e.target.value));
+    document.getElementById('nome').addEventListener('input', (e) => salvarDado('nome', e.target.value));
+    document.getElementById('cidade').addEventListener('input', (e) => salvarDado('cidade', e.target.value));
 
     document.getElementById('pix-payload').addEventListener('click', function() { copiarPix(); });
 });
 
-// 2. Service Worker
+// Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
         navigator.serviceWorker.register('./sw.js').catch(function(err) {});
     });
 }
 
-// 3. Instalação PWA
+// Instalação PWA
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -203,7 +281,7 @@ document.getElementById('btn-instalar').addEventListener('click', (e) => {
     }
 });
 
-// 4. Máscara de Moeda
+// Máscara de Moeda
 document.getElementById('valor').addEventListener('input', function(e) {
     let v = e.target.value.replace(/\D/g, '');
     if (!v) { e.target.value = ''; return; }
@@ -213,7 +291,7 @@ document.getElementById('valor').addEventListener('input', function(e) {
     e.target.value = v;
 });
 
-// 5. Algoritmo Pix
+// Algoritmo Pix
 function CRC16(str) {
     let crc = 0xFFFF;
     for (let c = 0; c < str.length; c++) {
@@ -253,7 +331,6 @@ function gerarPix() {
         return;
     }
 
-    // Padrão EMV estritamente compatível
     let merchantAccount = formatField('00', 'BR.GOV.BCB.PIX') + formatField('01', chave);
     
     let payload = formatField('00', '01') + 
@@ -327,4 +404,3 @@ function enviarWhatsApp() {
 
 </body>
 </html>
-
