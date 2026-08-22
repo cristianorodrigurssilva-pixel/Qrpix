@@ -2,17 +2,22 @@
   "name": "QrPix",
   "short_name": "QrPix",
   "description": "Gerador de QR Code Pix",
-  "start_url": "./index.html",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#7C3AED",
+  "background_color": "#eff6ff",
   "theme_color": "#2563eb",
-"background_color": "#eff6ff"
-,
   "icons": [
     {
-      "src": "./icon.svg?v=2",
+      "src": "./icon.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
