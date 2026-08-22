@@ -304,37 +304,44 @@ function formatField(id, value) {
     return id + len + value;
 }
 
+// Limpeza rigorosa de texto para padrão ASCII / Maiúsculas exigido pelo BACEN
 function limparTexto(texto) {
     if (!texto) return '';
     let t = texto.replace(/&/g, 'E');
     t = t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     t = t.replace(/[^a-zA-Z0-9 ]/g, "");
-    return t.trim();
+    return t.trim().toUpperCase();
 }
 
-// Tratamento de Chaves Pix ajustado para compatibilidade total
+// Tratamento rigoroso de Chaves Pix de acordo com as especificações do DICT / BACEN
 function tratarChavePix(chaveBruta) {
     let c = chaveBruta.trim();
     
-    // 1. E-mail ou Chave Aleatória (UUID com 36 caracteres)
-    if (c.includes('@') || (c.length === 36 && c.includes('-'))) {
-        return c;
+    // 1. E-mail (Preserva letras minúsculas e caracteres de e-mail)
+    if (c.includes('@')) {
+        return c.toLowerCase();
     }
 
-    // Extrai apenas dígitos para CPF, CNPJ e Telefone
+    // 2. Chave Aleatória EVP / UUID (36 caracteres)
+    if (c.length === 36 && c.includes('-')) {
+        return c.toLowerCase();
+    }
+
+    // Extrai apenas números para CPF, CNPJ e Celular
     let apenasNumeros = c.replace(/\D/g, '');
 
-    // 2. Telefone celular (10 ou 11 dígitos -> DDD + Número)
+    // 3. Telefone Celular (10 ou 11 dígitos -> DDD + número)
+    // O DICT exige formato de dígitos puros iniciando com o código 55 (ex: 5511999999999)
     if (apenasNumeros.length === 11 || apenasNumeros.length === 10) {
-        return '+55' + apenasNumeros;
+        return '55' + apenasNumeros;
     }
     
-    // 3. Telefone celular já digitado com 55 (12 ou 13 dígitos)
+    // 4. Telefone já digitado com 55 (12 ou 13 dígitos)
     if ((apenasNumeros.length === 13 || apenasNumeros.length === 12) && apenasNumeros.startsWith('55')) {
-        return '+' + apenasNumeros;
+        return apenasNumeros;
     }
 
-    // 4. CPF (11 dígitos) ou CNPJ (14 dígitos)
+    // 5. CPF (11 dígitos) ou CNPJ (14 dígitos)
     if (apenasNumeros.length === 11 || apenasNumeros.length === 14) {
         return apenasNumeros;
     }
@@ -368,11 +375,11 @@ function gerarPix() {
         payload += formatField('54', parseFloat(valor).toFixed(2));
     }
 
-    // AJUSTE MERCADO PAGO: Usando TXID alfanumérico "PIX" no ID 62 -> subcampo 05
+    // Padrão oficial BACEN para QR Code Estático
     payload += formatField('58', 'BR') + 
                formatField('59', nome) + 
                formatField('60', cidade) + 
-               formatField('62', formatField('05', 'PIX')) + 
+               formatField('62', formatField('05', '***')) + 
                '6304';
 
     const crc = CRC16(payload);
