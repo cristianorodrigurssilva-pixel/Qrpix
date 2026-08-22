@@ -3,74 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QrPix</title>
-
+    <title>QrPix (Ambiente de Testes)</title>
+    
+    <!-- Configurações PWA -->
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
-    <link rel="icon" type="image/svg+xml" href="./icon.svg">
+    <link rel="icon" type="image/svg+xml" href="./icon.svg?v=2">
 
     <!-- Biblioteca QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
+    
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            padding: 20px;
-            display: flex;
-            justify-content: center;
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        
+        body { 
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center; 
             align-items: center;
             min-height: 100vh;
         }
-
-        .container {
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 20px;
-            max-width: 450px;
-            width: 100%;
-            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.12);
+        
+        .container { 
+            background: #ffffff; 
+            padding: 25px; 
+            border-radius: 20px; 
+            max-width: 450px; 
+            width: 100%; 
+            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.12); 
             border: 1px solid #bfdbfe;
         }
-
-        h1 {
-            font-size: 30px;
-            font-weight: 800;
-            color: #1e3a8a;
-            margin-bottom: 20px;
+        
+        h1 { 
+            font-size: 30px; 
+            font-weight: 800; 
+            color: #1e3a8a; 
+            margin-bottom: 20px; 
             text-align: center;
             letter-spacing: 0.5px;
         }
+        .pix-color { color: #06b6d4; }
 
-        .pix-color {
-            color: #06b6d4;
-        }
-
-        label {
-            font-size: 14px;
-            font-weight: 700;
-            color: #1e3a8a;
-            display: block;
-            margin-top: 14px;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-top: 6px;
-            border: 2px solid #bfdbfe;
-            border-radius: 10px;
-            font-size: 16px;
-            background: #f8fafc;
+        label { font-size: 14px; font-weight: 700; color: #1e3a8a; display: block; margin-top: 14px; }
+        
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin-top: 6px; 
+            border: 2px solid #bfdbfe; 
+            border-radius: 10px; 
+            font-size: 16px; 
+            background: #f8fafc; 
             color: #1e293b;
+            transition: all 0.2s;
         }
-
         input:focus {
             outline: none;
             border-color: #2563eb;
@@ -78,63 +65,51 @@
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
         }
 
-        button {
-            width: 100%;
-            padding: 14px;
-            background-color: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 20px;
-            cursor: pointer;
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            background-color: #2563eb; 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            margin-top: 20px; 
+            cursor: pointer; 
+            transition: background 0.2s, transform 0.1s, color 0.2s;
         }
-
-        button:hover {
-            background-color: #1d4ed8;
-        }
-
-        .btn-whatsapp {
-            background-color: #25d366;
-            margin-top: 10px;
-        }
-
-        .btn-whatsapp:hover {
-            background-color: #1eb954;
-        }
-
-        #btn-instalar {
-            background-color: #0f172a;
-            display: none;
-        }
-
-        #qrcode-container {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            background: #ffffff;
+        button:hover { background-color: #1d4ed8; }
+        button:active { transform: scale(0.99); }
+        
+        .btn-whatsapp { background-color: #25d366; color: white; margin-top: 10px; }
+        .btn-whatsapp:hover { background-color: #1eb954; }
+        
+        #btn-instalar { background-color: #0f172a; color: white; display: none; }
+        #btn-instalar:hover { background-color: #1e293b; }
+        
+        #qrcode-container { 
+            margin-top: 20px; 
+            display: flex; 
+            justify-content: center; 
+            background: #ffffff; 
             padding: 12px;
             border-radius: 12px;
             border: 1px dashed #38bdf8;
         }
-
-        .result-box {
-            display: none;
-            margin-top: 20px;
-        }
-
-        textarea {
-            width: 100%;
-            height: 85px;
-            margin-top: 8px;
-            padding: 10px;
-            border-radius: 10px;
-            border: 2px solid #bfdbfe;
-            font-family: monospace;
-            font-size: 12px;
-            resize: none;
-            background: #f8fafc;
+        
+        .result-box { display: none; margin-top: 20px; }
+        
+        textarea { 
+            width: 100%; 
+            height: 85px; 
+            margin-top: 8px; 
+            padding: 10px; 
+            border-radius: 10px; 
+            border: 2px solid #bfdbfe; 
+            font-family: monospace; 
+            font-size: 12px; 
+            resize: none; 
+            background: #f8fafc; 
             color: #1e3a8a;
         }
 
@@ -150,953 +125,347 @@
             border-radius: 30px;
             font-weight: 800;
             font-size: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
             z-index: 9999;
             text-align: center;
+            white-space: nowrap;
         }
-
-        .toast.show {
-            display: block;
-        }
-
-        .erro {
-            color: #dc2626;
-            font-size: 13px;
-            font-weight: 600;
-            margin-top: 8px;
-            display: none;
-        }
+        .toast.show { display: block; }
     </style>
 </head>
-
 <body>
 
 <div class="container">
-
     <h1>Qr<span class="pix-color">Pix</span></h1>
 
-    <label for="chave">Chave Pix:</label>
-    <input
-        type="text"
-        id="chave"
-        placeholder="CPF, CNPJ, E-mail, Celular ou Aleatória"
-        autocomplete="off"
-    >
-
-    <div id="erro-chave" class="erro"></div>
+    <label for="chave">Chave Pix (Exata como no banco):</label>
+    <input type="text" id="chave" placeholder="CPF, CNPJ, E-mail, Celular ou Aleatória">
 
     <label for="nome">Nome do Recebedor:</label>
-    <input
-        type="text"
-        id="nome"
-        placeholder="Seu Nome ou Razão Social"
-        maxlength="25"
-    >
+    <input type="text" id="nome" placeholder="Seu Nome ou Razão Social">
 
     <label for="cidade">Cidade:</label>
-    <input
-        type="text"
-        id="cidade"
-        placeholder="Sua Cidade"
-        maxlength="15"
-    >
+    <input type="text" id="cidade" placeholder="Sua Cidade">
 
     <label for="valor">Valor (R$) (Opcional):</label>
-    <input
-        type="text"
-        id="valor"
-        placeholder="0,00"
-        inputmode="numeric"
-    >
+    <input type="text" id="valor" placeholder="0,00" inputmode="numeric">
 
-    <button type="button" onclick="gerarPix()">
-        Gerar QR Code
-    </button>
+    <button type="button" onclick="gerarPix()">Gerar QR Code</button>
 
-    <button type="button" id="btn-instalar">
-        Instalar App no Celular
-    </button>
+    <button type="button" id="btn-instalar">Instalar App no Celular</button>
 
     <div id="result" class="result-box">
-
         <div id="qrcode-container"></div>
-
-        <label for="pix-payload">
-            Código Pix Copia e Cola:
-        </label>
-
+        
+        <label for="pix-payload">Código Pix Copia e Cola:</label>
         <textarea id="pix-payload" readonly></textarea>
-
-        <button type="button" id="btn-copiar" onclick="copiarPix()">
-            Copiar Código Pix
-        </button>
-
-        <button type="button"
-                class="btn-whatsapp"
-                onclick="enviarWhatsApp()">
-            Enviar no WhatsApp
-        </button>
-
+        
+        <button type="button" id="btn-copiar" onclick="copiarPix()">Copiar Código Pix</button>
+        <button type="button" class="btn-whatsapp" onclick="enviarWhatsApp()">Enviar no WhatsApp</button>
     </div>
 </div>
 
-<div id="toast" class="toast">
-    ✓ Código Pix copiado!
-</div>
+<div id="toast" class="toast">✓ Código Pix copiado!</div>
 
 <script>
+// --- SISTEMA DE BANCO DE DADOS PERSISTENTE (IndexedDB + localStorage) ---
+let db;
+const dbName = "QrPixDatabase_TESTE";
 
-/* =========================================================
-   ARMAZENAMENTO
-   ========================================================= */
+function iniciarBanco() {
+    return new Promise((resolve) => {
+        const request = indexedDB.open(dbName, 1);
+        request.onupgradeneeded = function(e) {
+            let db = e.target.result;
+            if (!db.objectStoreNames.contains("dados")) {
+                db.createObjectStore("dados", { keyPath: "campo" });
+            }
+        };
+        request.onsuccess = function(e) {
+            db = e.target.result;
+            resolve();
+        };
+        request.onerror = function() {
+            resolve();
+        };
+    });
+}
 
 function salvarDado(campo, valor) {
-    try {
-        localStorage.setItem("qrpix_" + campo, valor);
-    } catch (e) {}
+    localStorage.setItem('pix_teste_' + campo, valor);
+
+    if (db) {
+        try {
+            const tx = db.transaction("dados", "readwrite");
+            const store = tx.objectStore("dados");
+            store.put({ campo: campo, valor: valor });
+        } catch (err) {}
+    }
 }
 
 function carregarDados() {
-    try {
-        const campos = ["chave", "nome", "cidade"];
+    let chave = localStorage.getItem('pix_teste_chave');
+    let nome = localStorage.getItem('pix_teste_nome');
+    let cidade = localStorage.getItem('pix_teste_cidade');
 
-        campos.forEach(function(campo) {
-            const valor = localStorage.getItem("qrpix_" + campo);
+    if (chave) document.getElementById('chave').value = chave;
+    if (nome) document.getElementById('nome').value = nome;
+    if (cidade) document.getElementById('cidade').value = cidade;
 
-            if (valor) {
-                document.getElementById(campo).value = valor;
-            }
-        });
-    } catch (e) {}
+    if (db && (!chave || !nome || !cidade)) {
+        try {
+            const tx = db.transaction("dados", "readonly");
+            const store = tx.objectStore("dados");
+            
+            store.get("chave").onsuccess = (e) => {
+                if (e.target.result && !document.getElementById('chave').value) {
+                    document.getElementById('chave').value = e.target.result.valor;
+                    localStorage.setItem('pix_teste_chave', e.target.result.valor);
+                }
+            };
+            store.get("nome").onsuccess = (e) => {
+                if (e.target.result && !document.getElementById('nome').value) {
+                    document.getElementById('nome').value = e.target.result.valor;
+                    localStorage.setItem('pix_teste_nome', e.target.result.valor);
+                }
+            };
+            store.get("cidade").onsuccess = (e) => {
+                if (e.target.result && !document.getElementById('cidade').value) {
+                    document.getElementById('cidade').value = e.target.result.valor;
+                    localStorage.setItem('pix_teste_cidade', e.target.result.valor);
+                }
+            };
+        } catch (err) {}
+    }
 }
 
-
-/* =========================================================
-   INICIALIZAÇÃO
-   ========================================================= */
-
-document.addEventListener("DOMContentLoaded", function() {
-
+document.addEventListener('DOMContentLoaded', async function() {
+    await iniciarBanco();
     carregarDados();
 
-    document.getElementById("chave")
-        .addEventListener("input", function(e) {
-            salvarDado("chave", e.target.value);
-        });
+    if (navigator.storage && navigator.storage.persist) {
+        navigator.storage.persist();
+    }
 
-    document.getElementById("nome")
-        .addEventListener("input", function(e) {
-            salvarDado("nome", e.target.value);
-        });
+    document.getElementById('chave').addEventListener('input', (e) => salvarDado('chave', e.target.value));
+    document.getElementById('nome').addEventListener('input', (e) => salvarDado('nome', e.target.value));
+    document.getElementById('cidade').addEventListener('input', (e) => salvarDado('cidade', e.target.value));
 
-    document.getElementById("cidade")
-        .addEventListener("input", function(e) {
-            salvarDado("cidade", e.target.value);
-        });
-
-    document.getElementById("valor")
-        .addEventListener("input", function(e) {
-
-            let v = e.target.value.replace(/\D/g, "");
-
-            if (!v) {
-                e.target.value = "";
-                return;
-            }
-
-            v = (parseInt(v, 10) / 100).toFixed(2);
-            v = v.replace(".", ",");
-
-            v = v.replace(
-                /(\d)(?=(\d{3})+(?!\d))/g,
-                "$1."
-            );
-
-            e.target.value = v;
-        });
-
-    document.getElementById("pix-payload")
-        .addEventListener("click", copiarPix);
+    document.getElementById('pix-payload').addEventListener('click', function() { copiarPix(); });
 });
 
-
-/* =========================================================
-   SERVICE WORKER
-   ========================================================= */
-
-if ("serviceWorker" in navigator) {
-
-    window.addEventListener("load", function() {
-
-        navigator.serviceWorker
-            .register("./sw.js")
-            .catch(function() {});
-
+// Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').catch(function(err) {});
     });
-
 }
 
-
-/* =========================================================
-   INSTALAÇÃO PWA
-   ========================================================= */
-
-let deferredPrompt = null;
-
-window.addEventListener("beforeinstallprompt", function(e) {
-
+// Instalação PWA
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
-
     deferredPrompt = e;
-
-    const botao =
-        document.getElementById("btn-instalar");
-
-    botao.style.display = "block";
-
+    document.getElementById('btn-instalar').style.display = 'block';
 });
 
-
-document.getElementById("btn-instalar")
-    .addEventListener("click", async function() {
-
-        if (!deferredPrompt) return;
-
+document.getElementById('btn-instalar').addEventListener('click', (e) => {
+    if (deferredPrompt) {
         deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+    }
+});
 
-        try {
-            await deferredPrompt.userChoice;
-        } catch (e) {}
+// Máscara de Moeda
+document.getElementById('valor').addEventListener('input', function(e) {
+    let v = e.target.value.replace(/\D/g, '');
+    if (!v) { e.target.value = ''; return; }
+    v = (parseInt(v, 10) / 100).toFixed(2);
+    v = v.replace('.', ',');
+    v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+    e.target.value = v;
+});
 
-        deferredPrompt = null;
-
-        this.style.display = "none";
-
-    });
-
-
-/* =========================================================
-   LIMPEZA DE TEXTO
-   ========================================================= */
-
-function limparTexto(texto) {
-
-    if (!texto) return "";
-
-    let t = texto
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
-
-    t = t.replace(/&/g, "E");
-
-    t = t.replace(/[^a-zA-Z0-9 ]/g, "");
-
-    return t
-        .trim()
-        .replace(/\s+/g, " ")
-        .toUpperCase();
-}
-
-
-/* =========================================================
-   FORMATAÇÃO DE CAMPOS PIX
-   ========================================================= */
-
-function formatField(id, value) {
-
-    const tamanho = value.length
-        .toString()
-        .padStart(2, "0");
-
-    return id + tamanho + value;
-}
-
-
-/* =========================================================
-   CRC16 - PADRÃO PIX
-   ========================================================= */
-
+// Algoritmo CRC16 CCITT-FALSE (Polinômio 0x1021, Valor inicial 0xFFFF)
 function CRC16(str) {
-
     let crc = 0xFFFF;
+    const encoder = new TextEncoder();
+    const bytes = encoder.encode(str);
 
-    for (let c = 0; c < str.length; c++) {
-
-        crc ^= str.charCodeAt(c) << 8;
-
+    for (let c = 0; c < bytes.length; c++) {
+        crc ^= bytes[c] << 8;
         for (let i = 0; i < 8; i++) {
-
             if ((crc & 0x8000) !== 0) {
-
-                crc =
-                    (crc << 1) ^
-                    0x1021;
-
+                crc = (crc << 1) ^ 0x1021;
             } else {
-
-                crc <<= 1;
-
+                crc = crc << 1;
             }
-
-            crc &= 0xFFFF;
         }
     }
-
-    return crc
-        .toString(16)
-        .toUpperCase()
-        .padStart(4, "0");
+    return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
 }
 
-
-/* =========================================================
-   CPF
-   ========================================================= */
-
-function validarCPF(cpf) {
-
-    cpf = cpf.replace(/\D/g, "");
-
-    if (cpf.length !== 11) return false;
-
-    if (/^(\d)\1{10}$/.test(cpf)) {
-        return false;
-    }
-
-    let soma = 0;
-
-    for (let i = 0; i < 9; i++) {
-        soma += parseInt(cpf[i]) * (10 - i);
-    }
-
-    let resto = (soma * 10) % 11;
-
-    if (resto === 10) resto = 0;
-
-    if (resto !== parseInt(cpf[9])) {
-        return false;
-    }
-
-    soma = 0;
-
-    for (let i = 0; i < 10; i++) {
-        soma += parseInt(cpf[i]) * (11 - i);
-    }
-
-    resto = (soma * 10) % 11;
-
-    if (resto === 10) resto = 0;
-
-    return resto === parseInt(cpf[10]);
+// Formatação do campo calculando o tamanho exato em BYTES (UTF-8)
+function formatField(id, value) {
+    const encoder = new TextEncoder();
+    const len = encoder.encode(value).length.toString().padStart(2, '0');
+    return id + len + value;
 }
 
-
-/* =========================================================
-   CNPJ
-   ========================================================= */
-
-function validarCNPJ(cnpj) {
-
-    cnpj = cnpj.replace(/\D/g, "");
-
-    if (cnpj.length !== 14) return false;
-
-    if (/^(\d)\1{13}$/.test(cnpj)) {
-        return false;
-    }
-
-    let tamanho = 12;
-    let numeros = cnpj.substring(0, tamanho);
-    let digitos = cnpj.substring(tamanho);
-
-    let pos = tamanho - 7;
-    let soma = 0;
-
-    for (let i = tamanho; i >= 1; i--) {
-
-        soma +=
-            parseInt(numeros[tamanho - i]) * pos;
-
-        pos--;
-
-        if (pos < 2) pos = 9;
-    }
-
-    let resultado = soma % 11 < 2
-        ? 0
-        : 11 - (soma % 11);
-
-    if (resultado !== parseInt(digitos[0])) {
-        return false;
-    }
-
-    tamanho = 13;
-    numeros = cnpj.substring(0, tamanho);
-    pos = tamanho - 7;
-    soma = 0;
-
-    for (let i = tamanho; i >= 1; i--) {
-
-        soma +=
-            parseInt(numeros[tamanho - i]) * pos;
-
-        pos--;
-
-        if (pos < 2) pos = 9;
-    }
-
-    resultado = soma % 11 < 2
-        ? 0
-        : 11 - (soma % 11);
-
-    return resultado === parseInt(digitos[1]);
+// Sanitização estrita de texto conforme norma BR Code BACEN (Apenas ASCII Limpo / Caixa Alta)
+function limparTexto(texto) {
+    if (!texto) return '';
+    let t = texto.replace(/&/g, 'E');
+    t = t.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Remove acentos
+    t = t.replace(/[^a-zA-Z0-9 ]/g, "");                   // Remove caracteres especiais
+    return t.trim().toUpperCase();                        // Caixa alta e sem espaços nas bordas
 }
 
-
-/* =========================================================
-   CHAVE ALEATÓRIA
-   ========================================================= */
-
-function validarEVP(chave) {
-
-    return /^[0-9a-fA-F-]{36}$/.test(chave);
-}
-
-
-/* =========================================================
-   TRATAMENTO DA CHAVE PIX
-   ========================================================= */
-
+// Tratamento de Chaves Pix para o padrão do DICT / Banco Central
 function tratarChavePix(chaveBruta) {
-
     let c = chaveBruta.trim();
-
-    if (!c) {
-        return null;
+    
+    // E-mail (Preserva letras minúsculas)
+    if (c.includes('@')) {
+        return c.toLowerCase();
     }
 
-
-    /* E-mail */
-
-    if (c.includes("@")) {
-
-        const email =
-            c.toLowerCase();
-
-        if (
-            email.length <= 77 &&
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-        ) {
-            return email;
-        }
-
-        return null;
+    // Chave Aleatória / EVP (36 caracteres com hífen)
+    if (c.length === 36 && c.includes('-')) {
+        return c.toLowerCase();
     }
 
+    // Extrai apenas dígitos numéricos
+    let apenasNumeros = c.replace(/\D/g, '');
 
-    /* Chave aleatória */
-
-    if (
-        c.length === 36 &&
-        c.includes("-")
-    ) {
-
-        if (validarEVP(c)) {
-            return c.toLowerCase();
-        }
-
-        return null;
+    // Celular sem código de país -> Adiciona 55 (Ex: 5511999999999)
+    if (apenasNumeros.length === 10 || apenasNumeros.length === 11) {
+        return '55' + apenasNumeros;
     }
 
-
-    const numeros =
-        c.replace(/\D/g, "");
-
-
-    /*
-       CNPJ primeiro
-       */
-
-    if (numeros.length === 14) {
-
-        if (validarCNPJ(numeros)) {
-            return numeros;
-        }
-
-        return null;
+    // Celular com código de país já incluso
+    if ((apenasNumeros.length === 12 || apenasNumeros.length === 13) && apenasNumeros.startsWith('55')) {
+        return apenasNumeros;
     }
 
-
-    /*
-       CPF antes do telefone.
-       Esta é a correção principal.
-       */
-
-    if (numeros.length === 11) {
-
-        if (validarCPF(numeros)) {
-            return numeros;
-        }
-
-        /*
-           Se não for CPF válido,
-           pode ser telefone.
-        */
+    // CPF (11) ou CNPJ (14)
+    if (apenasNumeros.length === 11 || apenasNumeros.length === 14) {
+        return apenasNumeros;
     }
 
-
-    /*
-       Telefone com 55
-       */
-
-    if (
-        numeros.length === 13 &&
-        numeros.startsWith("55")
-    ) {
-
-        return numeros;
-    }
-
-
-    /*
-       Telefone sem 55
-       */
-function tratarChavePix(chaveBruta) {
-
-    let c = chaveBruta.trim();
-
-    if (!c) {
-        return null;
-    }
-
-    // E-mail
-    if (c.includes("@")) {
-
-        const email = c.toLowerCase();
-
-        if (
-            email.length <= 77 &&
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-        ) {
-            return email;
-        }
-
-        return null;
-    }
-
-    // Chave aleatória (EVP)
-    if (c.length === 36 && c.includes("-")) {
-
-        if (/^[0-9a-fA-F-]{36}$/.test(c)) {
-            return c.toLowerCase();
-        }
-
-        return null;
-    }
-
-    const numeros = c.replace(/\D/g, "");
-
-    // CNPJ
-    if (numeros.length === 14) {
-
-        if (validarCNPJ(numeros)) {
-            return numeros;
-        }
-
-        return null;
-    }
-
-    // CPF
-    if (numeros.length === 11) {
-
-        if (validarCPF(numeros)) {
-            return numeros;
-        }
-
-        /*
-         * Um número de 11 dígitos que não é CPF
-         * pode ser um telefone celular.
-         *
-         * Não adicionamos 55 automaticamente se
-         * o usuário já informou o código do país.
-         */
-
-        if (
-            numeros.startsWith("9") ||
-            numeros.length === 11
-        ) {
-            return "55" + numeros;
-        }
-
-        return null;
-    }
-
-    // Telefone com DDI 55
-    if (
-        numeros.length === 12 &&
-        numeros.startsWith("55")
-    ) {
-        return numeros;
-    }
-
-    if (
-        numeros.length === 13 &&
-        numeros.startsWith("55")
-    ) {
-        return numeros;
-    }
-
-    // Telefone nacional com DDD
-    if (
-        numeros.length === 10 ||
-        numeros.length === 11
-    ) {
-        return "55" + numeros;
-    }
-
-    return null;
+    return c;
 }
-
-/* =========================================================
-   MOSTRAR ERRO
-   ========================================================= */
-
-function mostrarErroChave(mensagem) {
-
-    const erro =
-        document.getElementById("erro-chave");
-
-    erro.textContent = mensagem;
-
-    erro.style.display = "block";
-}
-
-
-function esconderErroChave() {
-
-    document.getElementById("erro-chave")
-        .style.display = "none";
-}
-
-
-/* =========================================================
-   GERAR PIX
-   ========================================================= */
 
 function gerarPix() {
+    let chaveBruta = document.getElementById('chave').value;
+    let nomeOriginal = document.getElementById('nome').value;
+    let cidadeOriginal = document.getElementById('cidade').value;
+    let valorInput = document.getElementById('valor').value;
 
-    esconderErroChave();
+    let chave = tratarChavePix(chaveBruta);
+    let nome = limparTexto(nomeOriginal).substring(0, 25);
+    let cidade = limparTexto(cidadeOriginal).substring(0, 15);
 
-
-    const chaveBruta =
-        document.getElementById("chave").value;
-
-    const nomeOriginal =
-        document.getElementById("nome").value;
-
-    const cidadeOriginal =
-        document.getElementById("cidade").value;
-
-
-    let valor =
-        document.getElementById("valor").value
-        .replace(/\./g, "")
-        .replace(",", ".")
-        .trim();
-
-
-    const chave =
-        tratarChavePix(chaveBruta);
-
-
-    if (!chave) {
-
-        mostrarErroChave(
-            "Digite uma chave Pix válida."
-        );
-
+    if (!chave || !nome || !cidade) {
+        alert('Por favor, preencha a chave Pix, o nome e a cidade.');
         return;
     }
 
+    // 00: Payload Format Indicator ("01")
+    // 01: Point of Initiation Method ("12" - QR Code Estático)
+    let payload = formatField('00', '01') + formatField('01', '12');
 
-    const nome =
-        limparTexto(nomeOriginal)
-        .substring(0, 25);
+    // 26: Merchant Account Information (GUI + Chave Pix)
+    let merchantAccount = formatField('00', 'BR.GOV.BCB.PIX') + formatField('01', chave);
+    payload += formatField('26', merchantAccount);
 
+    // 52: Merchant Category Code ("0000" - Geral)
+    // 53: Transaction Currency ("986" - Real BRL)
+    payload += formatField('52', '0000') + formatField('53', '986');
 
-    const cidade =
-        limparTexto(cidadeOriginal)
-        .substring(0, 15);
-
-
-    if (!nome) {
-
-        alert(
-            "Digite o nome do recebedor."
-        );
-
-        return;
-    }
-
-
-    if (!cidade) {
-
-        alert(
-            "Digite a cidade."
-        );
-
-        return;
-    }
-
-
-    if (
-        valor &&
-        (
-            isNaN(valor) ||
-            parseFloat(valor) <= 0
-        )
-    ) {
-
-        alert(
-            "Digite um valor válido."
-        );
-
-        return;
-    }
-
-
-    /*
-       Merchant Account Information
-       */
-
-    const merchantAccount =
-        formatField(
-            "00",
-            "BR.GOV.BCB.PIX"
-        ) +
-        formatField(
-            "01",
-            chave
-        );
-
-
-    let payload =
-        formatField("00", "01") +
-        formatField("26", merchantAccount) +
-        formatField("52", "0000") +
-        formatField("53", "986");
-
-
-    /*
-       Valor opcional
-       */
-
-    if (
-        valor &&
-        !isNaN(valor) &&
-        parseFloat(valor) > 0
-    ) {
-
-        payload +=
-            formatField(
-                "54",
-                parseFloat(valor).toFixed(2)
-            );
-    }
-
-
-    /*
-       País, nome, cidade
-       */
-
-    payload +=
-        formatField("58", "BR") +
-        formatField("59", nome) +
-        formatField("60", cidade) +
-        formatField(
-            "62",
-            formatField("05", "***")
-        );
-
-
-    /*
-       CRC16
-       */
-
-    payload += "6304";
-
-    const crc = CRC16(payload);
-
-    const pixCompleto =
-        payload + crc;
-
-
-    /*
-       Exibir código
-       */
-
-    document.getElementById(
-        "pix-payload"
-    ).value = pixCompleto;
-
-
-    /*
-       Gerar QR Code
-       */
-
-    const container =
-        document.getElementById(
-            "qrcode-container"
-        );
-
-    container.innerHTML = "";
-
-
-    if (typeof QRCode === "undefined") {
-
-        alert(
-            "Não foi possível carregar o gerador de QR Code. Verifique sua conexão com a internet."
-        );
-
-        return;
-    }
-
-
-    new QRCode(
-        container,
-        {
-            text: pixCompleto,
-            width: 180,
-            height: 180,
-            correctLevel: QRCode.CorrectLevel.M
+    // 54: Transaction Amount (Opcional)
+    if (valorInput) {
+        let valorTratado = valorInput.replace(/\./g, '').replace(',', '.').trim();
+        let valorNum = parseFloat(valorTratado);
+        if (!isNaN(valorNum) && valorNum > 0) {
+            payload += formatField('54', valorNum.toFixed(2));
         }
-    );
+    }
 
+    // 58: Country Code ("BR")
+    // 59: Merchant Name
+    // 60: Merchant City
+    payload += formatField('58', 'BR') + 
+               formatField('59', nome) + 
+               formatField('60', cidade);
 
-    document.getElementById(
-        "result"
-    ).style.display = "block";
+    // 62: Additional Data Field Template (Subtag 05: TXID = "***")
+    let txidField = formatField('05', '***');
+    payload += formatField('62', txidField);
+
+    // 63: CRC16 (Tag 63 + Length "04")
+    payload += '6304';
+
+    // Cálculo do Checksum final de 4 caracteres
+    const crc = CRC16(payload);
+    const pixCompleto = payload + crc;
+
+    // Atualiza a tela e o QR Code
+    document.getElementById('pix-payload').value = pixCompleto;
+    document.getElementById('qrcode-container').innerHTML = '';
+
+    new QRCode(document.getElementById('qrcode-container'), { 
+        text: pixCompleto, 
+        width: 180, 
+        height: 180,
+        correctLevel: QRCode.CorrectLevel.M
+    });
+
+    document.getElementById('result').style.display = 'block';
 }
 
-
-/* =========================================================
-   COPIAR PIX
-   ========================================================= */
-
 function mostrarAviso() {
-
-    const toast =
-        document.getElementById("toast");
-
-    const btn =
-        document.getElementById("btn-copiar");
-
-
-    toast.classList.add("show");
-
-    btn.innerText =
-        "✓ Código Copiado!";
-
+    const toast = document.getElementById('toast');
+    const btn = document.getElementById('btn-copiar');
+    
+    toast.classList.add('show');
+    btn.innerText = '✓ Código Copiado!';
+    btn.style.backgroundColor = '#06b6d4';
+    btn.style.color = '#0f172a';
 
     setTimeout(function() {
-
-        toast.classList.remove("show");
-
-        btn.innerText =
-            "Copiar Código Pix";
-
+        toast.classList.remove('show');
+        btn.innerText = 'Copiar Código Pix';
+        btn.style.backgroundColor = '#2563eb';
+        btn.style.color = '#ffffff';
     }, 2200);
 }
 
-
 function copiarPix() {
-
-    const campo =
-        document.getElementById(
-            "pix-payload"
-        );
-
-    const texto =
-        campo.value.trim();
-
-
+    const payloadInput = document.getElementById('pix-payload');
+    const texto = payloadInput.value.trim();
     if (!texto) return;
 
+    payloadInput.focus();
+    payloadInput.select();
 
-    if (
-        navigator.clipboard &&
-        window.isSecureContext
-    ) {
-
-        navigator.clipboard
-            .writeText(texto)
-            .then(mostrarAviso)
-            .catch(function() {
-
-                copiarFallback(texto);
-
-            });
-
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(texto).then(() => mostrarAviso()).catch(() => {
+            document.execCommand('copy');
+            mostrarAviso();
+        });
     } else {
-
-        copiarFallback(texto);
-
-    }
-}
-
-
-function copiarFallback(texto) {
-
-    const campo =
-        document.getElementById(
-            "pix-payload"
-        );
-
-    campo.focus();
-    campo.select();
-
-    try {
-
-        document.execCommand("copy");
-
+        document.execCommand('copy');
         mostrarAviso();
-
-    } catch (e) {
-
-        alert(
-            "Não foi possível copiar automaticamente. Selecione o código e copie manualmente."
-        );
-
     }
 }
-
-
-/* =========================================================
-   WHATSAPP
-   ========================================================= */
 
 function enviarWhatsApp() {
-
-    const pixCode =
-        document.getElementById(
-            "pix-payload"
-        ).value.trim();
-
-
+    const pixCode = document.getElementById('pix-payload').value.trim();
     if (!pixCode) return;
-
-
-    const url =
-        "https://api.whatsapp.com/send?text=" +
-        encodeURIComponent(pixCode);
-
-
-    window.open(
-        url,
-        "_blank"
-    );
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(pixCode)}`;
+    window.open(url, '_blank');
 }
-
 </script>
 
 </body>
