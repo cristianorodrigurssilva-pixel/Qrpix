@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QrPix</title>
+    <title>QrPix (Ambiente de Testes)</title>
     
     <!-- Configurações PWA -->
     <link rel="manifest" href="./manifest.json">
@@ -170,7 +170,7 @@
 <script>
 // --- SISTEMA DE BANCO DE DADOS PERSISTENTE (IndexedDB + localStorage) ---
 let db;
-const dbName = "QrPixDatabase";
+const dbName = "QrPixDatabase_TESTE";
 
 function iniciarBanco() {
     return new Promise((resolve) => {
@@ -186,16 +186,14 @@ function iniciarBanco() {
             resolve();
         };
         request.onerror = function() {
-            resolve(); // fallback para localStorage em caso de bloqueio
+            resolve();
         };
     });
 }
 
 function salvarDado(campo, valor) {
-    // 1. Salva no localStorage
-    localStorage.setItem('pix_' + campo, valor);
+    localStorage.setItem('pix_teste_' + campo, valor);
 
-    // 2. Salva no IndexedDB (Mais resistente contra limpezas do sistema)
     if (db) {
         try {
             const tx = db.transaction("dados", "readwrite");
@@ -206,16 +204,14 @@ function salvarDado(campo, valor) {
 }
 
 function carregarDados() {
-    // Primeiro tenta ler do localStorage
-    let chave = localStorage.getItem('pix_chave');
-    let nome = localStorage.getItem('pix_nome');
-    let cidade = localStorage.getItem('pix_cidade');
+    let chave = localStorage.getItem('pix_teste_chave');
+    let nome = localStorage.getItem('pix_teste_nome');
+    let cidade = localStorage.getItem('pix_teste_cidade');
 
     if (chave) document.getElementById('chave').value = chave;
     if (nome) document.getElementById('nome').value = nome;
     if (cidade) document.getElementById('cidade').value = cidade;
 
-    // Se faltar algum dado no localStorage, busca do IndexedDB
     if (db && (!chave || !nome || !cidade)) {
         try {
             const tx = db.transaction("dados", "readonly");
@@ -224,19 +220,19 @@ function carregarDados() {
             store.get("chave").onsuccess = (e) => {
                 if (e.target.result && !document.getElementById('chave').value) {
                     document.getElementById('chave').value = e.target.result.valor;
-                    localStorage.setItem('pix_chave', e.target.result.valor);
+                    localStorage.setItem('pix_teste_chave', e.target.result.valor);
                 }
             };
             store.get("nome").onsuccess = (e) => {
                 if (e.target.result && !document.getElementById('nome').value) {
                     document.getElementById('nome').value = e.target.result.valor;
-                    localStorage.setItem('pix_nome', e.target.result.valor);
+                    localStorage.setItem('pix_teste_nome', e.target.result.valor);
                 }
             };
             store.get("cidade").onsuccess = (e) => {
                 if (e.target.result && !document.getElementById('cidade').value) {
                     document.getElementById('cidade').value = e.target.result.valor;
-                    localStorage.setItem('pix_cidade', e.target.result.valor);
+                    localStorage.setItem('pix_teste_cidade', e.target.result.valor);
                 }
             };
         } catch (err) {}
@@ -247,7 +243,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     await iniciarBanco();
     carregarDados();
 
-    // Solicita ao navegador permissão para armazenamento persistente (evita exclusão automática)
     if (navigator.storage && navigator.storage.persist) {
         navigator.storage.persist();
     }
@@ -317,12 +312,43 @@ function limparTexto(texto) {
     return t.trim();
 }
 
+// Tratamento inteligente para todos os tipos de chave Pix
+function tratarChavePix(chaveBruta) {
+    let c = chaveBruta.trim();
+    
+    // 1. E-mail ou Chave Aleatória (UUID com 36 caracteres)
+    if (c.includes('@') || (c.length === 36 && c.includes('-'))) {
+        return c;
+    }
+
+    // Extrai apenas dígitos para CPF, CNPJ e Telefone
+    let apenasNumeros = c.replace(/\D/g, '');
+
+    // 2. Telefone celular (10 ou 11 dígitos -> DDD + Número)
+    if (apenasNumeros.length === 11 || apenasNumeros.length === 10) {
+        return '+55' + apenasNumeros;
+    }
+    
+    // 3. Telefone celular já digitado com 55 (12 ou 13 dígitos)
+    if ((apenasNumeros.length === 13 || apenasNumeros.length === 12) && apenasNumeros.startsWith('55')) {
+        return '+' + apenasNumeros;
+    }
+
+    // 4. CPF (11 dígitos) ou CNPJ (14 dígitos)
+    if (apenasNumeros.length === 11 || apenasNumeros.length === 14) {
+        return apenasNumeros;
+    }
+
+    return c;
+}
+
 function gerarPix() {
-    let chave = document.getElementById('chave').value.trim();
+    let chaveBruta = document.getElementById('chave').value;
     let nomeOriginal = document.getElementById('nome').value;
     let cidadeOriginal = document.getElementById('cidade').value;
     let valor = document.getElementById('valor').value.replace(/\./g, '').replace(',', '.').trim();
 
+    let chave = tratarChavePix(chaveBruta);
     let nome = limparTexto(nomeOriginal).substring(0, 25);
     let cidade = limparTexto(cidadeOriginal).substring(0, 15);
 
@@ -404,3 +430,4 @@ function enviarWhatsApp() {
 
 </body>
 </html>
+
