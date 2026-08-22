@@ -1,45 +1,159 @@
-const CACHE_NAME = 'qrpix-pro-v2';
+const CACHE_NAME = "qrpix-v3";
+
 const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Logo_do_Pix.svg/1200px-Logo_do_Pix.svg.png'
+    "./",
+    "./index.html",
+    "./manifest.json",
+    "./icon.svg",
+    "./icon-512.png"
 ];
 
-// Instalação do Service Worker e gravação do cachê
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('Arquivos em cachê gravados com sucesso.');
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
-  );
-  self.skipWaiting();
+/* =========================================================
+   INSTALAÇÃO
+   ========================================================= */
+
+self.addEventListener("install", function(event) {
+
+    event.waitUntil(
+
+        caches.open(CACHE_NAME)
+            .then(function(cache) {
+
+                return cache.addAll(
+                    ASSETS_TO_CACHE
+                );
+
+            })
+
+    );
+
+    self.skipWaiting();
 });
 
-// Ativação e limpeza de cachês antigos
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            console.log('Removendo cachê antigo:', cache);
-            return caches.delete(cache);
-          }
-        })
-      );
-    })
-  );
-  self.clients.claim();
+
+/* =========================================================
+   ATIVAÇÃO
+   ========================================================= */
+
+self.addEventListener("activate", function(event) {
+
+    event.waitUntil(
+
+        caches.keys()
+            .then(function(cacheNames) {
+
+                return Promise.all(
+
+                    cacheNames.map(function(cacheName) {
+
+                        if (
+                            cacheName !== CACHE_NAME
+                        ) {
+
+                            return caches.delete(
+                                cacheName
+                            );
+
+                        }
+
+                    })
+
+                );
+
+            })
+
+            .then(function() {
+
+                return self.clients.claim();
+
+            })
+
+    );
+
 });
 
-// Intercepta requisições para responder via cachê se estiver sem internet
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
-  );
+
+/* =========================================================
+   REQUISIÇÕES
+   ========================================================= */
+
+self.addEventListener("fetch", function(event) {
+
+    /*
+       Apenas requisições GET podem
+       ser armazenadas no cache.
+    */
+
+    if (event.request.method !== "GET") {
+        return;
+    }
+
+
+    event.respondWith(
+
+        caches.match(event.request)
+            .then(function(cachedResponse) {
+
+                if (cachedResponse) {
+                    return cachedResponse;
+                }
+
+
+                return fetch(event.request)
+                    .then(function(networkResponse) {
+
+                        /*
+                           Salva no cache apenas
+                           respostas válidas.
+                        */
+
+                        if (
+                            networkResponse &&
+                            networkResponse.status === 200 &&
+                            networkResponse.type !== "opaque"
+                        ) {
+
+                            const responseClone =
+                                networkResponse.clone();
+
+                            caches.open(CACHE_NAME)
+                                .then(function(cache) {
+
+                                    cache.put(
+                                        event.request,
+                                        responseClone
+                                    );
+
+                                });
+
+                        }
+
+                        return networkResponse;
+
+                    })
+                    .catch(function() {
+
+                        /*
+                           Se estiver offline e o arquivo
+                           não estiver no cache, deixa o
+                           navegador tratar o erro.
+                        */
+
+                        return new Response(
+                            "QrPix: conteúdo indisponível offline.",
+                            {
+                                status: 503,
+                                headers: {
+                                    "Content-Type":
+                                        "text/plain; charset=utf-8"
+                                }
+                            }
+                        );
+
+                    });
+
+            })
+
+    );
+
 });
