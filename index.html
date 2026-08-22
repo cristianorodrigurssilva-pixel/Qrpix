@@ -286,14 +286,11 @@ document.getElementById('valor').addEventListener('input', function(e) {
     e.target.value = v;
 });
 
-// Algoritmo CRC16 CCITT-FALSE (Polinômio 0x1021, Valor inicial 0xFFFF)
+// Algoritmo CRC16 CCITT-FALSE
 function CRC16(str) {
     let crc = 0xFFFF;
-    const encoder = new TextEncoder();
-    const bytes = encoder.encode(str);
-
-    for (let c = 0; c < bytes.length; c++) {
-        crc ^= bytes[c] << 8;
+    for (let c = 0; c < str.length; c++) {
+        crc ^= str.charCodeAt(c & 0xFF) << 8;
         for (let i = 0; i < 8; i++) {
             if ((crc & 0x8000) !== 0) {
                 crc = (crc << 1) ^ 0x1021;
@@ -305,50 +302,47 @@ function CRC16(str) {
     return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
 }
 
-// Formatação do campo calculando o tamanho exato em BYTES (UTF-8)
+// Formatação TLV
 function formatField(id, value) {
-    const encoder = new TextEncoder();
-    const len = encoder.encode(value).length.toString().padStart(2, '0');
+    const len = value.length.toString().padStart(2, '0');
     return id + len + value;
 }
 
-// Sanitização estrita de texto conforme norma BR Code BACEN (Apenas ASCII Limpo / Caixa Alta)
+// Limpeza de Texto conforme padronização do BACEN (ASCII Estrito)
 function limparTexto(texto) {
     if (!texto) return '';
     let t = texto.replace(/&/g, 'E');
-    t = t.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Remove acentos
-    t = t.replace(/[^a-zA-Z0-9 ]/g, "");                   // Remove caracteres especiais
-    return t.trim().toUpperCase();                        // Caixa alta e sem espaços nas bordas
+    t = t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    t = t.replace(/[^a-zA-Z0-9 ]/g, "");
+    return t.trim().toUpperCase();
 }
 
-// Tratamento de Chaves Pix para o padrão do DICT / Banco Central
+// Formatação estrita das Chaves
 function tratarChavePix(chaveBruta) {
     let c = chaveBruta.trim();
     
-    // E-mail (Preserva letras minúsculas)
+    // E-mail
     if (c.includes('@')) {
         return c.toLowerCase();
     }
 
-    // Chave Aleatória / EVP (36 caracteres com hífen)
+    // Chave Aleatória (EVP)
     if (c.length === 36 && c.includes('-')) {
         return c.toLowerCase();
     }
 
-    // Extrai apenas dígitos numéricos
     let apenasNumeros = c.replace(/\D/g, '');
 
-    // Celular sem código de país -> Adiciona 55 (Ex: 5511999999999)
+    // Celular: Formato Internacional (+55 é exigido para validação do DICT em transações reais)
     if (apenasNumeros.length === 10 || apenasNumeros.length === 11) {
-        return '55' + apenasNumeros;
+        return '+55' + apenasNumeros;
     }
 
-    // Celular com código de país já incluso
     if ((apenasNumeros.length === 12 || apenasNumeros.length === 13) && apenasNumeros.startsWith('55')) {
-        return apenasNumeros;
+        return '+' + apenasNumeros;
     }
 
-    // CPF (11) ou CNPJ (14)
+    // CPF ou CNPJ
     if (apenasNumeros.length === 11 || apenasNumeros.length === 14) {
         return apenasNumeros;
     }
@@ -371,19 +365,14 @@ function gerarPix() {
         return;
     }
 
-    // 00: Payload Format Indicator ("01")
-    // 01: Point of Initiation Method ("12" - QR Code Estático)
-    let payload = formatField('00', '01') + formatField('01', '12');
+    // Payload básico no padrão BR Code Estático
+    let payload = formatField('00', '01');
 
-    // 26: Merchant Account Information (GUI + Chave Pix)
     let merchantAccount = formatField('00', 'BR.GOV.BCB.PIX') + formatField('01', chave);
     payload += formatField('26', merchantAccount);
 
-    // 52: Merchant Category Code ("0000" - Geral)
-    // 53: Transaction Currency ("986" - Real BRL)
     payload += formatField('52', '0000') + formatField('53', '986');
 
-    // 54: Transaction Amount (Opcional)
     if (valorInput) {
         let valorTratado = valorInput.replace(/\./g, '').replace(',', '.').trim();
         let valorNum = parseFloat(valorTratado);
@@ -392,25 +381,18 @@ function gerarPix() {
         }
     }
 
-    // 58: Country Code ("BR")
-    // 59: Merchant Name
-    // 60: Merchant City
     payload += formatField('58', 'BR') + 
                formatField('59', nome) + 
                formatField('60', cidade);
 
-    // 62: Additional Data Field Template (Subtag 05: TXID = "***")
     let txidField = formatField('05', '***');
     payload += formatField('62', txidField);
 
-    // 63: CRC16 (Tag 63 + Length "04")
     payload += '6304';
 
-    // Cálculo do Checksum final de 4 caracteres
     const crc = CRC16(payload);
     const pixCompleto = payload + crc;
 
-    // Atualiza a tela e o QR Code
     document.getElementById('pix-payload').value = pixCompleto;
     document.getElementById('qrcode-container').innerHTML = '';
 
