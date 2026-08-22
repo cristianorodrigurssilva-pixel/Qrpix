@@ -312,7 +312,7 @@ function limparTexto(texto) {
     return t.trim();
 }
 
-// Tratamento inteligente para todos os tipos de chave Pix
+// Tratamento de Chaves Pix ajustado para compatibilidade total
 function tratarChavePix(chaveBruta) {
     let c = chaveBruta.trim();
     
@@ -368,10 +368,11 @@ function gerarPix() {
         payload += formatField('54', parseFloat(valor).toFixed(2));
     }
 
+    // AJUSTE MERCADO PAGO: Usando TXID alfanumérico "PIX" no ID 62 -> subcampo 05
     payload += formatField('58', 'BR') + 
                formatField('59', nome) + 
                formatField('60', cidade) + 
-               formatField('62', formatField('05', '***')) + 
+               formatField('62', formatField('05', 'PIX')) + 
                '6304';
 
     const crc = CRC16(payload);
@@ -430,4 +431,3 @@ function enviarWhatsApp() {
 
 </body>
 </html>
-
